@@ -18,4 +18,6 @@ void logheader () ;
 bool jeAdresar (std::string) ;
 bool jeSubor (std::string) ;
 
+long long gettime () ;
+
 #endif

@@ -73,3 +73,9 @@ bool jeSubor (string filename) {
     if (stat(filename.c_str(), &st)) return false;
     return S_ISREG(st.st_mode);
 }
+
+long long gettime () {
+  struct timeval tim;
+  gettimeofday(&tim, NULL);
+  return tim.tv_sec*1000LL + tim.tv_usec/1000LL;
+}

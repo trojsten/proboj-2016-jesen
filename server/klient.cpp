@@ -6,18 +6,20 @@ using namespace std;
 
 Klient::Klient () {}
 
-Klient::Klient (string _uvodneData, string adresar, string execCommand, string zaznamovyAdresar)
-    : uvodneData(_uvodneData), poslRestart(-1)
+Klient::Klient (string _meno, string _uvodneData, string adresar, string execCommand, string zaznamovyAdresar)
+    : meno(_meno), uvodneData(_uvodneData)
 {
     vector<string> command;
     command.push_back(execCommand);
     proces.setProperties(command, adresar, zaznamovyAdresar + "/" + meno + ".log");
 }
 
-Klient::Klient (string _uvodneData, string adresar, string zaznamovyAdresar)
-    : Klient(_uvodneData, adreser, "./hrac", zaznamovyAdresar) {}
+Klient::Klient (string _meno, string _uvodneData, string adresar, string zaznamovyAdresar)
+    : Klient(_meno, _uvodneData, adresar, "./hrac", zaznamovyAdresar) {}
 
 void Klient::restartuj () {
+    // este nemame policy na to, ako casto mozno resetovat klienta
+    // moze byt problem s prilis castym resetovanim
     precitane.clear();
     proces.restartuj();
 

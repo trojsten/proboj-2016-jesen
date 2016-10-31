@@ -41,6 +41,12 @@ template<class T> void checkOstream(T& s, string filename) {
     }
 }
 
+bool validchar (char ch) {
+	if ((ch >= '0' && ch <= '9') || (ch == '/') || (ch == '-') || (ch == '_')) {
+		return false;
+	}
+	return true;
+}
 
 int main(int argc, char *argv[]) {
     if (argc < 5) {
@@ -69,11 +75,12 @@ int main(int argc, char *argv[]) {
     checkOstream(observationstream, "observation");
 	
     { // spermutujeme poradie hracov, dame im dobre mena, a farby
+        // a vytvorime ich, kazdemu nastavime uvodne data, ...
         string metainfo;
         
         random_shuffle(argv + 4, argv + argc);
         set<string> uzMena;
-            
+        
         for (int i=4; i<argc; i++) {
             string klientAdr(argv[i]);
             // meno klienta je cast za poslednym /, za ktorym nieco je
@@ -81,11 +88,11 @@ int main(int argc, char *argv[]) {
             while (r > 0 && !validchar(klientAdr[r - 1])) {
                 r--;
             }
-            if (r == 0 || (r < klientAdr.size() && klientAdr[r] != '/')) {
+            if (r == 0 || (r < (int) klientAdr.size() && klientAdr[r] != '/')) {
                 r++;
             }
             int l = r - 1;
-            while (l > 0 && klientAdr[l-1] != '/') {
+            while (l > 0 && klientAdr[l - 1] != '/') {
                 l--;
             }
             string meno = klientAdr.substr(l, r - l);
@@ -95,14 +102,16 @@ int main(int argc, char *argv[]) {
                 meno += "+";
             }
             uzMena.insert(meno);
-            string uvodneData = "hrac " + toString<int>(i - 4) + "\n";
+            // posleme klientovi, kolkaty v poradi je
+            string uvodneData = "hrac " + to_string(i - 4) + "\n";
+
             klienti.push_back(Klient(meno, uvodneData, klientAdr, zaznAdr));
 
             string riadok;
             if (dajNahodnuFarbu) {
                 for (int i = 0; i < 3; i++) {
                     double cl = (9 + (double)(rand() % (2 * 9)) ) / (4 * 9);
-                    riadok += toString<double>(cl) + " ";
+                    riadok += to_string(cl) + " ";
                 }
                 riadok += "1.0";
             }
@@ -128,37 +137,34 @@ int main(int argc, char *argv[]) {
 
     // ABSENT: zakoduje pociatocny stav a posle ho
     // potom pocka chvilu --- cas na predpocitanie
-    usleep(CAS_NA_INICIALIZACIU*1000ll);
+    usleep(1000 * 1000ll);
+
+
+    // PRIKLAD toho, ako moze prebiehat komunikacia
+    // medzi serverom a klientom
+    long long lasttime = gettime();
 
     bool koncim = false;
     while (!koncim) {
-        string resetAns;
-        {
-            stringstream temp;
-            koduj(temp, stavAlt(stavHry));
-            resetAns = temp.str();
-        }
-        while (gettime() - ltime < TAH_CAS) {
-            for (unsigned k=0; k<klienti.size(); k++) {
-            if (!klienti[k].zije() && (klienti[k].getMeno() != "observer")) {
-                klienti[k].restartuj();
-                klienti[k].posli(resetAns + "end\n");
-                continue;
-            }
-            stringstream riadky(klienti[k].citaj(MAX_CITAJ));
-            odpovedaj(k, riadky, resetAns);
+        while (gettime() - lasttime < 1000) {
+            // fetchujeme spravy klientov, ale este nesimulujeme kolo
+            for (unsigned k = 0; k < klienti.size(); k++) {
+                if (!klienti[k].zije()) {
+                    klienti[k].restartuj();
+                    // klientovi posleme relevantne data
+                        // klienti[k].posli("blablabla");
+                    continue;
+                }
+                // nacitame to co nam poslal klient a nieco s tym...
+                    // stringstream riadky(klienti[k].citaj(MAX_CITAJ));
             }
         }
-        ltime = gettime();
-            
-        stringstream pokracovanieHistorie;
-        koncim = odsimulujKolo(stavHry, kodpovede, pokracovanieHistorie);
-        for (unsigned k=0; k<klienti.size(); k++) {
-            kodpovede[k].clear();
-        }
-        historia += pokracovanieHistorie.str();
+        lasttime = gettime();
 
-        observationstream << pokracovanieHistorie.str() << flush;
+        // odsimulujeme kolo
+
+        // dame do zaznamu co treba
+            // observationstream << "blablabla" << flush;
     }
 	
     // cleanup
@@ -170,6 +176,7 @@ int main(int argc, char *argv[]) {
     // alebo nieco ine, podla coho hodnotit
     ofstream rankstream((zaznAdr+"/rank").c_str());
     checkOstream(rankstream, zaznAdr+"/rank");
+        // tu by nieco malo byt
     rankstream.close();
 
     // +- info o dlzke hry
