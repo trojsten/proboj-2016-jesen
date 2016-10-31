@@ -4,14 +4,14 @@
 #include "proces.h"
 
 class Klient {
-  private:
+ private:
     std::string meno;
     std::string uvodneData;
     Proces proces;
     std::string precitane;
     long long poslRestart;
     
-  public:
+ public:
     Klient () ;
     Klient (std::string _label, std::string uvodneData, std::string adresar, std::string nazovExec, std::string logAdresar) ;
     Klient (std::string _label, std::string uvodneData, std::string adresar, std::string logAdresar) ;

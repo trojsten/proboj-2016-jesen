@@ -21,88 +21,88 @@ struct stavAlt ;
 
 
 struct bod {
-	int x,y;
+    int x,y;
 
-	bod () ;
-	bod (int a,int b) ;
+    bod () ;
+    bod (int a,int b) ;
 
-	bod operator- (const bod A) const ;
-	double dist () const ;
-	int casCestovania () const ;
+    bod operator- (const bod A) const ;
+    double dist () const ;
+    int casCestovania () const ;
 
-	static string nazovtyp () ;
+    static string nazovtyp () ;
 };
 
 struct mesto {
-	int populacia; //WARNING nepouzivat --- na zistenie populacie je zistiPop() !!!!!!!!!
-	int poslCas;
+    int populacia; //WARNING nepouzivat --- na zistenie populacie je zistiPop() !!!!!!!!!
+    int poslCas;
 
-	int id, vlastnik;
-	int kapacita, rast;
-	int utok, obrana, stena;
-	bod pozicia;
+    int id, vlastnik;
+    int kapacita, rast;
+    int utok, obrana, stena;
+    bod pozicia;
 	
-	mesto () ;
+    mesto () ;
 
-	int zistiPop () ;
-	int def () ; // celkova obranna sila mesta (vypocitana zo zistiPop(), obrany a steny)
+    int zistiPop () ;
+    int def () ; // celkova obranna sila mesta (vypocitana zo zistiPop(), obrany a steny)
 
-	static string nazovtyp () ;
+    static string nazovtyp () ;
 };
 
 struct invazia {
-	int odchod;
-	int prichod;
-	int vlastnik;
-	mesto* od;
-	mesto* kam;
-	int jednotiek;
+    int odchod;
+    int prichod;
+    int vlastnik;
+    mesto* od;
+    mesto* kam;
+    int jednotiek;
 
-	invazia () ;
-	invazia (int odch, int prich, int vlast, mesto* odkial, mesto* kamze, int jedn) ;
+    invazia () ;
+    invazia (int odch, int prich, int vlast, mesto* odkial, mesto* kamze, int jedn) ;
 
-	int atk () ; // celkova utocna sila invazie
-	int def () ; // celkova obranna sila obrancu
+    int atk () ; // celkova utocna sila invazie
+    int def () ; // celkova obranna sila obrancu
 
-	static string nazovtyp () ;
+    static string nazovtyp () ;
 };
 
 struct invAlt { // alternativna reprezentacia invazie
-	int odchod, prichod, vlastnik, od, kam, jednotiek;
+    int odchod, prichod, vlastnik, od, kam, jednotiek;
 
-	invAlt () ;
-	invAlt (int odch, int prich, int vlast, int odkial, int kamze, int jedn) ;
-	invAlt (invazia inv) ;
+    invAlt () ;
+    invAlt (int odch, int prich, int vlast, int odkial, int kamze, int jedn) ;
+    invAlt (invazia inv) ;
 
-	static string nazovtyp () ;
+    static string nazovtyp () ;
 };
 
 struct stav {
-	int cas;
-	vector<mesto> mesta;
-	deque<vector<invazia*> > invPodlaCasu;
+    int cas;
+    vector<mesto> mesta;
+    deque<vector<invazia*> > invPodlaCasu;
 
-	stav () ;
-	stav (stavAlt& S) ;
+    stav () ;
+    stav (stavAlt& S) ;
 	
-	void nastavMesto (int id, int vlastnik, int populacia) ;
-	void nastavCas (int t) ;
+    void nastavMesto (int id, int vlastnik, int populacia) ;
+    void nastavCas (int t) ;
 
-	bool nastavInv (int odchod, int prichod, int vlastnik, int od, int kam, int jednotiek) ;
-	bool nastavInv (invAlt inv) ;
+    bool nastavInv (int odchod, int prichod, int vlastnik, int od, int kam, int jednotiek) ;
+    bool nastavInv (invAlt inv) ;
 
-	static string nazovtyp () ;
+    static string nazovtyp () ;
 };
 
 struct stavAlt { // alternativna reprezentacia stavu
-	int cas;
-	vector<mesto> mesta;
-	vector<invAlt> invZoznam;
+    int cas;
+    vector<mesto> mesta;
+    vector<invAlt> invZoznam;
 
-	stavAlt () ;
-	stavAlt (stav& S) ;
+    stavAlt () ;
+    stavAlt (stav& S) ;
 
-	static string nazovtyp () ;
+    static string nazovtyp () ;
 };
 
 #endif
@@ -112,36 +112,36 @@ struct stavAlt { // alternativna reprezentacia stavu
 // tieto udaje pouziva marshal.cpp aby vedel ako tie struktury ukladat a nacitavat
 
 reflection(bod);
-  member(x);
-  member(y);
+member(x);
+member(y);
 end();
 
 reflection(mesto);
-	member(populacia);
-	member(poslCas);
-	member(id);
-	member(vlastnik);
-	member(kapacita);
-	member(rast);
-	member(utok);
-	member(obrana);
-	member(stena);
-	member(pozicia);
+member(populacia);
+member(poslCas);
+member(id);
+member(vlastnik);
+member(kapacita);
+member(rast);
+member(utok);
+member(obrana);
+member(stena);
+member(pozicia);
 end();
 
 reflection(invAlt);
-	member(odchod);
-	member(prichod);
-	member(vlastnik);
-	member(od);
-	member(kam);
-	member(jednotiek);
+member(odchod);
+member(prichod);
+member(vlastnik);
+member(od);
+member(kam);
+member(jednotiek);
 end();
 
 reflection(stavAlt);
-	member(cas);
-	member(mesta);
-	member(invZoznam);
+member(cas);
+member(mesta);
+member(invZoznam);
 end();
 
 #endif

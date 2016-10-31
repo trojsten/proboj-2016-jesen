@@ -5,7 +5,7 @@
 #include <string>
 
 class Proces {
-  private:
+ private:
     std::vector<std::string> args;
     std::string cwd;
     std::string errfile;
@@ -13,7 +13,7 @@ class Proces {
     int writefd;
     int readfd;
 
-  public:
+ public:
     Proces () ;
 
     int getPid () ;
