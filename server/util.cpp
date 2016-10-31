@@ -13,7 +13,6 @@ using namespace std;
 
 #include "util.h"
 
-
 static void (*cleanupFunkcia)();
 
 static atomic<pid_t> hlavnyProces(0);
@@ -22,12 +21,12 @@ static atomic<bool> praveUkoncujem(false);
 static void shutdownHandler (int signum) {
     signal(signum, SIG_DFL);
     if (getpid() == hlavnyProces && !praveUkoncujem) {
-	praveUkoncujem = true;
-	fprintf(stderr, "dostal som ukoncovaci signal %s\n", strsignal(signum));
-	if (cleanupFunkcia) {
-	    fprintf(stderr, "volam cleanup funkciu\n");
-	    cleanupFunkcia();
-	}
+        praveUkoncujem = true;
+        fprintf(stderr, "dostal som ukoncovaci signal %s\n", strsignal(signum));
+        if (cleanupFunkcia) {
+            fprintf(stderr, "volam cleanup funkciu\n");
+            cleanupFunkcia();
+        }
     }
     raise(signum);
 }
@@ -35,9 +34,9 @@ static void shutdownHandler (int signum) {
 static void sigchldHandler (int signum) {
     int pid, status;
     while ((pid = waitpid(-1, &status, WNOHANG)), (pid > 0)) {
-	if (WIFSIGNALED(status)) {
-	    fprintf(stderr, "proces %d umrel na: %s\n", pid, strsignal(WTERMSIG(status)) );
-	}
+        if (WIFSIGNALED(status)) {
+            fprintf(stderr, "proces %d umrel na: %s\n", pid, strsignal(WTERMSIG(status)) );
+        }
     }
 }
 
@@ -73,10 +72,4 @@ bool jeSubor (string filename) {
     struct stat st;
     if (stat(filename.c_str(), &st)) return false;
     return S_ISREG(st.st_mode);
-}
-
-long long gettime () {
-    struct timeval tim;
-    gettimeofday(&tim, NULL);
-    return tim.tv_sec*1000LL + tim.tv_usec/1000LL;
 }

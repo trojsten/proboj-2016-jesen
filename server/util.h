@@ -18,12 +18,4 @@ void logheader () ;
 bool jeAdresar (std::string) ;
 bool jeSubor (std::string) ;
 
-long long gettime () ;
-
-template<class T> std::string toString (T obj) {
-    stringstream ss;
-    ss << obj;
-    return ss.str();
-}
-
 #endif
