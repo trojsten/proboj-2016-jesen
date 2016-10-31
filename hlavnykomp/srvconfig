@@ -1,0 +1,17 @@
+
+klienti=( hlupy fljun amazon paulinia perry nulano struze baklazan total jobokrki luaro)
+mapy=( mapy/*.map )
+nazvy=(
+  'Hlupy'
+  'Fljun'
+  'Amazon'
+  'Paulinia'
+  'Perry'
+  'Nulano'
+  'Styri ruze'
+  'Baklazan'
+  'Total Anihilation'
+  'Jobokrki'
+  'Lukas a Roman'
+)
+
