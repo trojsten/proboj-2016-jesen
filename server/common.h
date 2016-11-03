@@ -6,6 +6,15 @@
 
 using namespace std;
 
+enum direction {
+    LEFT, RIGHT, UP, DOWN
+};
+
+struct player_command {
+    direction dir;
+};
+
+
 struct point {
     int x, y;
 };
@@ -17,6 +26,7 @@ struct block {
 
 struct player {
     point position;
+    bool alive;
 
     int score;
 
@@ -24,8 +34,14 @@ struct player {
 };
 
 struct game_state {
+    int width, height;
+
     vector<player> players;
     vector<block> blocks;
+
+    int block_index(int x, int y) {
+	return y * width + x;
+    }
 };
 
 #endif
