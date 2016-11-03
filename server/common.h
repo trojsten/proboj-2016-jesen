@@ -11,12 +11,11 @@ struct point {
 };
 
 struct block {
-    int color;
-    bool solid;
+    int owned_by;
+    int crossed_by;
 };
 
 struct player {
-    int color;
     point position;
 
     int score;
@@ -24,9 +23,9 @@ struct player {
     //TODO: bonuses
 };
 
-struct area {
+struct game_state {
     vector<player> players;
-    map<point, vector<block>> blocks;
+    vector<block> blocks;
 };
 
 #endif
@@ -34,5 +33,25 @@ struct area {
 
 #ifdef reflection
 // tieto udaje pouziva marshal.cpp aby vedel ako tie struktury ukladat a nacitavat
+
+reflection(point)
+    member(x)
+    member(y)
+end()
+
+reflection(block)
+    member(owned_by)
+    member(crossed_by)
+end()
+
+reflection(player)
+    member(position)
+    member(score)
+end()
+
+reflection(game_state)
+    member(players)
+    member(blocks)
+end()
 
 #endif
