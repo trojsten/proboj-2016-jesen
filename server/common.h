@@ -39,8 +39,8 @@ struct game_state {
     vector<player> players;
     vector<block> blocks;
 
-    int block_index(int x, int y) {
-	return y * width + x;
+    int block_index(point pos) {
+	return pos.x * height + pos.y;
     }
 };
 
