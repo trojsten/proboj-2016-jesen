@@ -56,17 +56,24 @@ inline ll mod(ll n,ll m){return ((n % m)+m)%m;}
 int n,m,dir=0;
 
 void do_move(int &x, int &y){
-	if(y+1 < m)y++;
-	else y--;
+	if(x+1 < n)x++;
+	else x--;
 }
+
+int sc[5];
 
 int main ()
 {
 	scanf("%d%d", &n, &m);
-	pf("3\nMarcel 255 0 0\nEmo 0 255 0\nMiso 0 0 255\n%d %d\n", n,m);
+	pf("3\nMarcel 255 0 0\nEmo 0 255 0\nMiso 0 0 255\n%d %d\n", n, m);
 
 	int x=n/2,y=m/2;
 	For(i, 1000){
+		For(j, 3){
+			sc[j] += rand() % 50;
+			pf("%d %d %d\n", rand() % n, rand()%m, sc[j]);
+		}
+
 		For(j, n){
 			For(k, m){
 				int val = -1;

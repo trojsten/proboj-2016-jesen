@@ -13,8 +13,11 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -44,6 +47,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     private int MAX_SLEEP_TIME = 3000;
     private int SLEEP_UNIT = 20;
     public static final Font RESULTS_FONT = new Font("Noto Sans", Font.PLAIN, 20);
+    private String DELIMETER_LINE = "+++++";
 
     public Frame() {
         initAll();
@@ -69,6 +73,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
         resultsTable = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Observer");
 
         javax.swing.GroupLayout observerPanelLayout = new javax.swing.GroupLayout(observerPanel);
         observerPanel.setLayout(observerPanelLayout);
@@ -129,6 +134,8 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     ArrayList<String> botNames;
     ArrayList<Color> botColors;
     ArrayList<JTextArea> botLogs;
+    ArrayList<ArrayList<Integer>> playerPoints;
+    ArrayList<BufferedReader> botLogReaders;
     String filename = null;
     Scanner in;
 
@@ -192,8 +199,13 @@ public class Frame extends javax.swing.JFrame implements Runnable {
 
     private void createBotLogs() {
         botLogs = new ArrayList<>();
+        playerPoints = new ArrayList<>();
+
         for (int i = 0; i < numBots; i++) {
             JTextArea a = new JTextArea();
+            if (filename == null) {
+                a.setText("Debugovacie logy sú dostupné iba v lokálnom móde!");
+            }
             a.setFont(RESULTS_FONT);
             a.setEditable(false);
             a.setFocusable(false);
@@ -201,6 +213,28 @@ public class Frame extends javax.swing.JFrame implements Runnable {
             pane.setViewportView(a);
             botLogs.add(a);
             tabbedPane.add(pane, botNames.get(i));
+        }
+
+        //open log files
+        if (filename != null) {
+            botLogReaders = new ArrayList<>(numBots);
+            for (int i = 0; i < numBots; i++) {
+                try {
+                    BufferedReader read = new BufferedReader(new FileReader(new File(botNames.get(i) + ".log")));
+                    botLogReaders.add(read);
+                    while (true) {
+                        String line = read.readLine();
+                        if (line.equals(DELIMETER_LINE)) {
+                            break;
+                        }
+                        botLogs.get(i).setText(botLogs.get(i).getText() + line+"\n");
+                    }
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
 
@@ -253,29 +287,54 @@ public class Frame extends javax.swing.JFrame implements Runnable {
 
         while (true) {
             long time = System.currentTimeMillis();
-            SwingUtilities.invokeLater(() -> {
+            //read general
+            for (int i = 0; i < numBots; i++) {
+                ArrayList<Integer> tmpList = new ArrayList<>();
+                int xpos = in.nextInt();
+                int ypos = in.nextInt();
+                int score = in.nextInt();
 
-                for (int i = 0; i < N; i++) {
-                    for (int j = 0; j < M; j++) {
-                        whoseArea[i][j] = in.nextInt();
-                        whoseSnake[i][j] = in.nextInt();
-                    }
+                tmpList.add(xpos);
+                tmpList.add(ypos);
+                playerPoints.add(tmpList);
+
+                resultsTable.getModel().setValueAt(score, i, 1);
+            }
+
+            //read map
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < M; j++) {
+                    whoseArea[i][j] = in.nextInt();
+                    whoseSnake[i][j] = in.nextInt();
                 }
+            }
+
+            //read logs
+            for (int i = 0; i < numBots; i++) {
+                try {
+                    String s;
+                    while (!(s = botLogReaders.get(i).readLine()).equals(DELIMETER_LINE)) {
+                        botLogs.get(i).setText(botLogs.get(i).getText() + s+"\n");
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            SwingUtilities.invokeLater(() -> {
                 observerPanel.setData(whoseArea, whoseSnake);
                 observerPanel.repaint();
             });
+
             long totTime = (System.currentTimeMillis() - time);
             //System.out.println("TOT time: " + totTime);
-            
-            
             try {
-                Thread.sleep(SLEEP_TIME - totTime);
+                Thread.sleep(Math.max(SLEEP_TIME - totTime, (long) MIN_SLEEP_TIME));
                 synchronized (this) {
                     while (paused) {
                         this.wait();
                     }
                 }
-
             } catch (InterruptedException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 System.err.println(ex);
