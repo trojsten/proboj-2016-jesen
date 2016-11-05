@@ -70,7 +70,6 @@
     </Container>
     <Container class="javax.swing.JTabbedPane" name="tabbedPane">
       <Properties>
-        <Property name="focusCycleRoot" type="boolean" value="true"/>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="RESULTS_FONT" type="code"/>
         </Property>
@@ -93,6 +92,7 @@
                 <Column editable="true" title="Body" type="java.lang.Object"/>
               </Table>
             </Property>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
       </SubComponents>

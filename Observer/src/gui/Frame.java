@@ -152,10 +152,17 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     }
 
     private Action pauseObserver() {
-        Action a = new AbstractAction() {
+        Frame instance = this;
+        Action a;
+        a = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                paused = !paused;
+                synchronized (instance) {
+                    paused = !paused;
+                    if (paused == false) {
+                        instance.notifyAll();
+                    }
+                }
             }
         };
         return a;
@@ -258,9 +265,17 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                 observerPanel.repaint();
             });
             long totTime = (System.currentTimeMillis() - time);
-
+            //System.out.println("TOT time: " + totTime);
+            
+            
             try {
-                Thread.sleep(SLEEP_TIME-totTime);
+                Thread.sleep(SLEEP_TIME - totTime);
+                synchronized (this) {
+                    while (paused) {
+                        this.wait();
+                    }
+                }
+
             } catch (InterruptedException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 System.err.println(ex);
