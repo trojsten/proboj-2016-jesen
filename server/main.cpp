@@ -22,36 +22,52 @@ using namespace std;
 vector<Klient> klienti;
 
 /* Komment z minuleho proboja. Mozno to chceme lepsie.
-    // tato trapna funkcia existuje len kvoli inicializujSignaly()
-    // btw, takto sa signal handling nerobi
-    // len sa s tym nechceme babrat.
+// tato trapna funkcia existuje len kvoli inicializujSignaly()
+// btw, takto sa signal handling nerobi
+// len sa s tym nechceme babrat.
 */
 void zabiKlientov() {
     fprintf(stderr, "ukoncujem klientov\n");
     for (unsigned i=0; i<klienti.size(); i++) {
-        klienti[i].zabi();
+	klienti[i].zabi();
     }
 }
 
 template<class T> void checkOstream(T& s, string filename) {
     if (s.fail()) {
-        fprintf(stderr, "neviem zapisovat do %s\n", filename.c_str());
-        zabiKlientov();
-        exit(1);
+	fprintf(stderr, "neviem zapisovat do %s\n", filename.c_str());
+	zabiKlientov();
+	exit(1);
     }
 }
 
 bool validchar (char ch) {
-	if ((ch >= '0' && ch <= '9') || (ch == '/') || (ch == '-') || (ch == '_')) {
-		return false;
-	}
-	return true;
+    if ((ch >= '0' && ch <= '9') || (ch == '/') || (ch == '-') || (ch == '_')) {
+	return false;
+    }
+    return true;
+}
+
+string last_valid_substr(string s) {
+    int r = (int)s.size() - 1;
+    while (r > 0 && !validchar(s[r - 1])) {
+	r--;
+    }
+    if (r == 0 || (r < (int)s.size() &&s[r] != '/')) {
+	r++;
+    }
+    int l = r - 1;
+    while (l > 0 &&s[l - 1] != '/') {
+	l--;
+    }
+    string last = s.substr(l, r - l);
+    return last;
 }
 
 int main(int argc, char *argv[]) {
     if (argc < 5) {
-        fprintf(stderr, "usage: %s <zaznamovy-adresar> <mapa> <adresare-klienta-1> <adresar-klienta-2> ...\n", argv[0]);
-        return 0;
+	fprintf(stderr, "usage: %s <zaznamovy-adresar> <mapa> <adresare-klienta-1> <adresar-klienta-2> ...\n", argv[0]);
+	return 0;
     }
   
     unsigned int seed = time(NULL) * getpid();
@@ -61,13 +77,12 @@ int main(int argc, char *argv[]) {
 
     string zaznAdr(argv[1]);
     if (!jeAdresar(zaznAdr)) {
-        if (mkdir(zaznAdr.c_str(), 0777)) {
-            fprintf(stderr, "main/mkdir: %s: %s\n", zaznAdr.c_str(), strerror(errno));
-            exit(EXIT_FAILURE);
-        }
-    }
-    else {
-        fprintf(stderr, "main: prepisujem zaznamovy adresar: %s\n", zaznAdr.c_str());
+	if (mkdir(zaznAdr.c_str(), 0777)) {
+	    fprintf(stderr, "main/mkdir: %s: %s\n", zaznAdr.c_str(), strerror(errno));
+	    exit(EXIT_FAILURE);
+	}
+    } else {
+	fprintf(stderr, "main: prepisujem zaznamovy adresar: %s\n", zaznAdr.c_str());
     }
     
     string obsubor = zaznAdr+"/observation";
@@ -75,62 +90,50 @@ int main(int argc, char *argv[]) {
     checkOstream(observationstream, "observation");
 	
     { // spermutujeme poradie hracov, dame im dobre mena, a farby
-        // a vytvorime ich, kazdemu nastavime uvodne data, ...
-        string metainfo;
-        
-        random_shuffle(argv + 4, argv + argc);
-        set<string> uzMena;
-        
-        for (int i=4; i<argc; i++) {
-            string klientAdr(argv[i]);
-            // meno klienta je cast za poslednym /, za ktorym nieco je
-            int r = (int) klientAdr.size() - 1;
-            while (r > 0 && !validchar(klientAdr[r - 1])) {
-                r--;
-            }
-            if (r == 0 || (r < (int) klientAdr.size() && klientAdr[r] != '/')) {
-                r++;
-            }
-            int l = r - 1;
-            while (l > 0 && klientAdr[l - 1] != '/') {
-                l--;
-            }
-            string meno = klientAdr.substr(l, r - l);
-            bool dajNahodnuFarbu = false;
-            while (uzMena.count(meno)) {
-                dajNahodnuFarbu = true;
-                meno += "+";
-            }
-            uzMena.insert(meno);
-            // posleme klientovi, kolkaty v poradi je
-            string uvodneData = "hrac " + to_string(i - 4) + "\n";
+	// a vytvorime ich, kazdemu nastavime uvodne data, ...
+	
+	random_shuffle(argv + 3, argv + argc);
+	set<string> uzMena;
 
-            klienti.push_back(Klient(meno, uvodneData, klientAdr, zaznAdr));
+	int pocet_hracov = argc - 3;
+	observationstream << pocet_hracov << endl;
+	
+	for (int i = 3; i < argc; i++) {
+	    string klientAdr(argv[i]);
+	    string meno = last_valid_substr(klientAdr);
 
-            string riadok;
-            if (dajNahodnuFarbu) {
-                for (int i = 0; i < 3; i++) {
-                    double cl = (9 + (double)(rand() % (2 * 9)) ) / (4 * 9);
-                    riadok += to_string(cl) + " ";
-                }
-                riadok += "1.0";
-            }
-            else {
-                string clsubor = klientAdr + "/color";
-                fstream clstream(clsubor.c_str(), fstream::in);
-                getline(clstream, riadok);
-                clstream.close();
-            }
-            metainfo += meno + " " + riadok + "\n";
-        }
-        string metasubor = zaznAdr+"/meta";
-		fstream metastream(metasubor.c_str(), fstream::out | fstream::trunc);
-		metastream << metainfo << "end\n";
-        metastream.close();
-        
-        for (unsigned k=0; k<klienti.size(); k++) {
-            klienti[k].restartuj();
-        }
+	    // meno klienta je cast za poslednym /, za ktorym nieco je
+	    bool dajNahodnuFarbu = false;
+	    while (uzMena.count(meno)) {
+		dajNahodnuFarbu = true;
+		meno += "+";
+	    }
+	    uzMena.insert(meno);
+	    // posleme klientovi, kolkaty v poradi je
+	    string uvodneData = "hrac " + to_string(i - 4) + "\n";
+
+	    klienti.push_back(Klient(meno, uvodneData, klientAdr, zaznAdr));
+
+	    string farba;
+	    if (dajNahodnuFarbu) {
+		for (int i = 0; i < 3; i++) {
+		    double cl = (9 + (double)(rand() % (2 * 9)) ) / (4 * 9);
+		    farba += to_string(cl) + " ";
+		}
+		farba += "1.0";
+	    } else {
+		string clsubor = klientAdr + "/color";
+		fstream clstream(clsubor.c_str(), fstream::in);
+		getline(clstream, farba);
+		clstream.close();
+	    }
+
+	    observationstream << meno << " " << farba << endl;
+	}
+	
+	for (unsigned k=0; k<klienti.size(); k++) {
+	    klienti[k].restartuj();
+	}
     }
 
     // ABSENT: nacitame mapu
@@ -139,32 +142,31 @@ int main(int argc, char *argv[]) {
     // potom pocka chvilu --- cas na predpocitanie
     usleep(1000 * 1000ll);
 
-
     // PRIKLAD toho, ako moze prebiehat komunikacia
     // medzi serverom a klientom
     long long lasttime = gettime();
 
-    bool koncim = false;
+    bool koncim = true;
     while (!koncim) {
-        while (gettime() - lasttime < 1000) {
-            // fetchujeme spravy klientov, ale este nesimulujeme kolo
-            for (unsigned k = 0; k < klienti.size(); k++) {
-                if (!klienti[k].zije()) {
-                    klienti[k].restartuj();
-                    // klientovi posleme relevantne data
-                        // klienti[k].posli("blablabla");
-                    continue;
-                }
-                // nacitame to co nam poslal klient a nieco s tym...
-                    // stringstream riadky(klienti[k].citaj(MAX_CITAJ));
-            }
-        }
-        lasttime = gettime();
+	while (gettime() - lasttime < 1000) {
+	    // fetchujeme spravy klientov, ale este nesimulujeme kolo
+	    for (unsigned k = 0; k < klienti.size(); k++) {
+		if (!klienti[k].zije()) {
+		    klienti[k].restartuj();
+		    // klientovi posleme relevantne data
+		    // klienti[k].posli("blablabla");
+		    continue;
+		}
+		// nacitame to co nam poslal klient a nieco s tym...
+		// stringstream riadky(klienti[k].citaj(MAX_CITAJ));
+	    }
+	}
+	lasttime = gettime();
 
-        // odsimulujeme kolo
+	// odsimulujeme kolo
 
-        // dame do zaznamu co treba
-            // observationstream << "blablabla" << flush;
+	// dame do zaznamu co treba
+	// observationstream << "blablabla" << flush;
     }
 	
     // cleanup
@@ -176,7 +178,7 @@ int main(int argc, char *argv[]) {
     // alebo nieco ine, podla coho hodnotit
     ofstream rankstream((zaznAdr+"/rank").c_str());
     checkOstream(rankstream, zaznAdr+"/rank");
-        // tu by nieco malo byt
+    // tu by nieco malo byt
     rankstream.close();
 
     // +- info o dlzke hry

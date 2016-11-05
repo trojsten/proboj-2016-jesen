@@ -29,7 +29,7 @@ game_state *update_game_state(const game_state *gs, vector<player_command> comma
 	    int i = new_gs->block_index({x, y});
 
 	    // nothing serious could happend here
-	    if (gs->blocks[i].crossed_by == -1) continue;
+	    if (gs->blocks[i].crossed_by < 0) continue;
 
 	    // closed a rectangle
 	    if (gs->blocks[i].crossed_by == new_gs->blocks[i].crossed_by) {
