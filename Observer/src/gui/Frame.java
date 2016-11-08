@@ -271,7 +271,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
 
         for (int i = 0; i < numBots; i++) {
             botNames.add(in.next());
-            float r = in.nextFloat(), g = in.nextFloat(), b = in.nextFloat();
+            float r = in.nextFloat(), g = in.nextFloat(), b = in.nextFloat();in.nextFloat();
             botColors.add(new Color(r, g, b));
         }
         N = in.nextInt();
