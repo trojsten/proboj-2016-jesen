@@ -288,14 +288,21 @@ public class Frame extends javax.swing.JFrame implements Runnable {
         while (true) {
             long time = System.currentTimeMillis();
             //read general
+            playerPoints = new ArrayList<>();
+            
+            in.nextInt();
             for (int i = 0; i < numBots; i++) {
                 ArrayList<Integer> tmpList = new ArrayList<>();
+                
                 int xpos = in.nextInt();
                 int ypos = in.nextInt();
+                int direciton = in.nextInt();
+                int alive = in.nextInt();
                 int score = in.nextInt();
 
                 tmpList.add(xpos);
                 tmpList.add(ypos);
+                if(xpos >= N || ypos >= M)System.err.println("ERROR");
                 playerPoints.add(tmpList);
 
                 resultsTable.getModel().setValueAt(score, i, 1);
@@ -322,7 +329,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
             }
 
             SwingUtilities.invokeLater(() -> {
-                observerPanel.setData(whoseArea, whoseSnake);
+                observerPanel.setData(whoseArea, whoseSnake, playerPoints);
                 observerPanel.repaint();
             });
 

@@ -69,9 +69,10 @@ int main ()
 
 	int x=n/2,y=m/2;
 	For(i, 1000){
+		pf("3\n");
 		For(j, 3){
 			sc[j] += rand() % 50;
-			pf("%d %d %d\n", rand() % n, rand()%m, sc[j]);
+			pf("%d %d %d %d %d\n", rand() % n, rand()%m, 0, 1, sc[j]);
 		}
 
 		For(j, n){

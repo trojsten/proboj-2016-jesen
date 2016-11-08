@@ -7,6 +7,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 
 /**
@@ -22,7 +23,9 @@ public class Observer extends javax.swing.JPanel {
     int N, M;
     int PIXEL_SIZE = 50;
     ArrayList<Color> playerColors;
+    ArrayList<ArrayList<Integer> > playerHeads;
     final int UNDEFINED = -1;
+    private int HEAD = 1000;
 
     public Observer() {
         initComponents();
@@ -42,7 +45,9 @@ public class Observer extends javax.swing.JPanel {
             for (int j = 0; j < M; j++) {
                 if (data[i][j] == UNDEFINED) {
                     g.setColor(Color.WHITE);
-                } else {
+                } else if(data[i][j] >= HEAD){
+                    g.setColor(playerColors.get(data[i][j] - HEAD).darker().darker().darker());
+                }else {
                     g.setColor(playerColors.get(data[i][j]));
                 }
                 g.fillRect(xoffset + i * PIXEL_SIZE, yoffset + j * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
@@ -71,7 +76,7 @@ public class Observer extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    synchronized void setData(int[][] whoseArea, int[][] whoseSnake) {
+    synchronized void setData(int[][] whoseArea, int[][] whoseSnake, ArrayList<ArrayList<Integer> > heads) {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < M; j++) {
                 if (whoseSnake[i][j] == UNDEFINED) {
@@ -81,6 +86,11 @@ public class Observer extends javax.swing.JPanel {
                 }
                 //if(data[i][j] != -1)System.out.println(data[i][j] + " " +i +" "+j);
             }
+        }
+        playerHeads = heads;
+        for (int i = 0; i < playerHeads.size(); i++) {
+            ArrayList<Integer> l = playerHeads.get(i);
+            data[l.get(0)][l.get(1)] = HEAD+i;
         }
     }
 
