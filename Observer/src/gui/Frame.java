@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -220,7 +221,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
             botLogReaders = new ArrayList<>(numBots);
             for (int i = 0; i < numBots; i++) {
                 try {
-                    BufferedReader read = new BufferedReader(new FileReader(new File(botNames.get(i) + ".log")));
+                    BufferedReader read = new BufferedReader(new FileReader(Paths.get(filename, botNames.get(i) + ".log").toFile()));
                     botLogReaders.add(read);
                     while (true) {
                         String line = read.readLine();
@@ -256,7 +257,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     private void initObserver() {
         if (filename != null) {
             try {
-                in = new Scanner(new File(filename));
+                in = new Scanner(Paths.get(filename, "observation").toFile());
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
