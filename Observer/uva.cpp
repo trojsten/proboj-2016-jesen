@@ -65,7 +65,7 @@ int sc[5];
 int main ()
 {
 	scanf("%d%d", &n, &m);
-	pf("3\nMarcel 255 0 0\nEmo 0 255 0\nMiso 0 0 255\n%d %d\n", n, m);
+	pf("3\nMarcel 1 0 0\nEmo 0 1 0\nMiso 0 0 1\n%d %d\n", n, m);
 
 	int x=n/2,y=m/2;
 	For(i, 1000){
