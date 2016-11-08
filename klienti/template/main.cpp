@@ -3,5 +3,8 @@
 using namespace std;
 
 int main() {
-    while (true) { string s; cin >> s; }
+    while (true) {
+	cout << "cd " << "LEFT" << endl;
+	cout << "cd " << "RIGHT" << endl;
+    }
 }

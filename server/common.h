@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+#include "mapa.h"
+
 using namespace std;
 
 enum direction {
@@ -13,7 +15,6 @@ enum direction {
 struct player_command {
     direction dir;
 };
-
 
 struct point {
     int x, y;
@@ -26,6 +27,7 @@ struct block {
 
 struct player {
     point position;
+    direction dir;
     bool alive;
 
     int score;
@@ -38,6 +40,9 @@ struct game_state {
 
     vector<player> players;
     vector<block> blocks;
+
+    game_state() {}
+    game_state(int num_players, game_map gm);
 
     int block_index(point pos) {
 	return pos.x * height + pos.y;
@@ -62,6 +67,7 @@ end()
 
 reflection(player)
     member(position)
+    member(dir)
     member(score)
 end()
 

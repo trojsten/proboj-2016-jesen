@@ -17,7 +17,8 @@ using namespace std;
 #include "mapa.h"
 #include "marshal.h"
 
-#define MAX_CITAJ 1024
+const auto MAX_CITAJ = 1024;
+const auto ROUND_TIME = 1000;
 
 vector<Klient> klienti;
 
@@ -89,52 +90,55 @@ int main(int argc, char *argv[]) {
     fstream observationstream(obsubor.c_str(), fstream::out | fstream::trunc);
     checkOstream(observationstream, "observation");
 	
-    { // spermutujeme poradie hracov, dame im dobre mena, a farby
-	// a vytvorime ich, kazdemu nastavime uvodne data, ...
+    random_shuffle(argv + 3, argv + argc);
+    set<string> uzMena;
+
+    int pocet_hracov = argc - 3;
+    observationstream << pocet_hracov << endl;
 	
-	random_shuffle(argv + 3, argv + argc);
-	set<string> uzMena;
+    for (int i = 3; i < argc; i++) {
+	string klientAdr(argv[i]);
+	string meno = last_valid_substr(klientAdr);
 
-	int pocet_hracov = argc - 3;
-	observationstream << pocet_hracov << endl;
-	
-	for (int i = 3; i < argc; i++) {
-	    string klientAdr(argv[i]);
-	    string meno = last_valid_substr(klientAdr);
-
-	    // meno klienta je cast za poslednym /, za ktorym nieco je
-	    bool dajNahodnuFarbu = false;
-	    while (uzMena.count(meno)) {
-		dajNahodnuFarbu = true;
-		meno += "+";
-	    }
-	    uzMena.insert(meno);
-	    // posleme klientovi, kolkaty v poradi je
-	    string uvodneData = "hrac " + to_string(i - 4) + "\n";
-
-	    klienti.push_back(Klient(meno, uvodneData, klientAdr, zaznAdr));
-
-	    string farba;
-	    if (dajNahodnuFarbu) {
-		for (int i = 0; i < 3; i++) {
-		    double cl = (9 + (double)(rand() % (2 * 9)) ) / (4 * 9);
-		    farba += to_string(cl) + " ";
-		}
-		farba += "1.0";
-	    } else {
-		string clsubor = klientAdr + "/color";
-		fstream clstream(clsubor.c_str(), fstream::in);
-		getline(clstream, farba);
-		clstream.close();
-	    }
-
-	    observationstream << meno << " " << farba << endl;
+	// meno klienta je cast za poslednym /, za ktorym nieco je
+	bool dajNahodnuFarbu = false;
+	while (uzMena.count(meno)) {
+	    dajNahodnuFarbu = true;
+	    meno += "+";
 	}
-	
-	for (unsigned k=0; k<klienti.size(); k++) {
-	    klienti[k].restartuj();
+	uzMena.insert(meno);
+	// posleme klientovi, kolkaty v poradi je
+	string uvodneData = "hrac " + to_string(i - 4) + "\n";
+
+	klienti.push_back(Klient(meno, uvodneData, klientAdr, zaznAdr));
+
+	string farba;
+	if (dajNahodnuFarbu) {
+	    for (int i = 0; i < 3; i++) {
+		double cl = (9 + (double)(rand() % (2 * 9)) ) / (4 * 9);
+		farba += to_string(cl) + " ";
+	    }
+	    farba += "1.0";
+	} else {
+	    string clsubor = klientAdr + "/color";
+	    fstream clstream(clsubor.c_str(), fstream::in);
+	    getline(clstream, farba);
+	    clstream.close();
 	}
+
+	observationstream << meno << " " << farba << endl;
     }
+	
+    for (unsigned k = 0; k < klienti.size(); k++) {
+	klienti[k].restartuj();
+    }
+
+    game_map gm(10, 10);
+    gm.squares[2][2] = SPAWN;
+    gm.squares[2][8] = SPAWN;
+    gm.squares[8][8] = SPAWN;
+    gm.squares[8][2] = SPAWN;
+    game_state gs(pocet_hracov, gm);
 
     // ABSENT: nacitame mapu
 
@@ -142,13 +146,13 @@ int main(int argc, char *argv[]) {
     // potom pocka chvilu --- cas na predpocitanie
     usleep(1000 * 1000ll);
 
-    // PRIKLAD toho, ako moze prebiehat komunikacia
-    // medzi serverom a klientom
     long long lasttime = gettime();
 
-    bool koncim = true;
+    bool koncim = false;
     while (!koncim) {
-	while (gettime() - lasttime < 1000) {
+	vector<vector<player_command>> commands(klienti.size());
+
+	while (gettime() - lasttime < ROUND_TIME) {
 	    // fetchujeme spravy klientov, ale este nesimulujeme kolo
 	    for (unsigned k = 0; k < klienti.size(); k++) {
 		if (!klienti[k].zije()) {
@@ -157,13 +161,55 @@ int main(int argc, char *argv[]) {
 		    // klienti[k].posli("blablabla");
 		    continue;
 		}
-		// nacitame to co nam poslal klient a nieco s tym...
-		// stringstream riadky(klienti[k].citaj(MAX_CITAJ));
+
+		stringstream riadky(klienti[k].citaj(MAX_CITAJ));
+
+		while (true) {
+		    string cmd;
+		    riadky >> cmd;
+		    if (riadky.eof()) break;
+
+		    if (cmd == "cd") {
+			string dir;
+			riadky >> dir;
+			if (riadky.eof()) {
+			    cerr << "wrong input " << k << ": no dir after cd" << endl;
+			    continue;
+			}
+
+			if (dir == "LEFT") {
+			    commands[k].push_back(player_command{LEFT});
+			} else if (dir == "RIGHT") {
+			    commands[k].push_back(player_command{RIGHT});
+			} else if (dir == "UP") {
+			    commands[k].push_back(player_command{UP});
+			} else if (dir == "DOWN") {
+			    commands[k].push_back(player_command{DOWN});
+			} else {
+			    cerr << "wrong input " << k << ": invalid dir '" << dir << "'" << endl;
+			}
+		    } else {
+			cerr << "wrong input " << k << ": no such cmd '" << cmd << "'" << endl;
+		    }
+		}
 	    }
 	}
 	lasttime = gettime();
 
-	// odsimulujeme kolo
+	cout << "YAY" << endl;
+	gs = update_game_state(gs, commands);
+	cout << "NAY" << endl;
+
+	stringstream state_str;
+	uloz(state_str, gs);
+
+	for (unsigned k = 0; k < klienti.size(); k++) {
+	    if (commands[k].size() > 0) {
+		klienti[k].posli(state_str.str());
+	    }
+	}
+
+	observationstream << state_str.str() << endl;
 
 	// dame do zaznamu co treba
 	// observationstream << "blablabla" << flush;

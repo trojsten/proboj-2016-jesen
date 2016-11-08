@@ -1,12 +1,18 @@
 #include "update.h"
+#include <iostream>
 
-game_state *update_game_state(const game_state *gs, vector<player_command> commands) {
-    game_state *new_gs = new game_state;
-    *new_gs = *gs;
+using namespace std;
 
-    for (int i = 0; i < (int)gs->players.size(); i++) {
-	point new_position = gs->players[i].position;
-	switch (commands[i].dir) {
+game_state update_game_state(game_state gs, vector<vector<player_command>> commands) {
+    game_state new_gs = gs;
+
+    for (unsigned i = 0; i < gs.players.size(); i++) {
+	for (player_command cmd: commands[i]) {
+	    new_gs.players[i].dir = cmd.dir;
+	}
+
+	point new_position = new_gs.players[i].position;
+	switch (new_gs.players[i].dir) {
 	case LEFT:
 	    new_position.x -= 1;
 	    break;
@@ -20,27 +26,11 @@ game_state *update_game_state(const game_state *gs, vector<player_command> comma
 	    new_position.y += 1;
 	    break;
 	}
-	new_gs->players[i].position = new_position;
-	new_gs->blocks[new_gs->block_index(new_position)].crossed_by = i;
-    }
 
-    for (int x = 0; x < new_gs->width; x++) {
-	for (int y = 0; y < new_gs->height; y++) {
-	    int i = new_gs->block_index({x, y});
+	cout << "pos " << new_position.x << " " << new_position.y << " " << gs.block_index(new_position) << endl;
 
-	    // nothing serious could happend here
-	    if (gs->blocks[i].crossed_by < 0) continue;
-
-	    // closed a rectangle
-	    if (gs->blocks[i].crossed_by == new_gs->blocks[i].crossed_by) {
-		//TODO: fill the closed rectangle
-	    }
-
-	    // hit another player
-	    if (gs->blocks[i].crossed_by != new_gs->blocks[i].crossed_by) {
-		//TODO: kill the other player or both
-	    }
-	}
+	new_gs.players[i].position = new_position;
+	new_gs.blocks[new_gs.block_index(new_position)].crossed_by = i;
     }
 
     return new_gs;

@@ -3,6 +3,6 @@
 
 #include "common.h"
 
-void update_game_state(game_state *gs, vector<player_command> commands);
+game_state update_game_state(game_state gs, vector<vector<player_command>> commands);
 
 #endif

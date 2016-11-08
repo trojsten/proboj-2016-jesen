@@ -3,12 +3,20 @@ using namespace std;
 
 #include "marshal.h"
 
-template<> void uloz<int> (ostream& buf, const int& in) {
+template<> void uloz<int>(ostream& buf, const int& in) {
     buf << in << " ";
 }
 
-template<> void nacitaj<int> (istream& buf, int& out) {
+template<> void nacitaj<int>(istream& buf, int& out) {
     buf >> out;
+}
+
+template<> void uloz<direction>(std::ostream& out, const direction& in) {
+    uloz(out, (const int &)in);
+}
+
+template<> void nacitaj<direction>(std::istream& in, direction& out) {
+    nacitaj(in, (int &)out);
 }
 
 // uloz() pre (niektore) struktury z common.h
