@@ -310,6 +310,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
             }
 
             //read map
+            in.nextInt(); //miso prints num of elements in vvector 
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < M; j++) {
                     whoseArea[i][j] = in.nextInt();
