@@ -68,6 +68,7 @@ end()
 reflection(player)
     member(position)
     member(dir)
+    member(alive)
     member(score)
 end()
 

@@ -27,6 +27,11 @@ game_state update_game_state(game_state gs, vector<vector<player_command>> comma
 	    break;
 	}
 
+	if (new_position.x < 0) new_position.x = 0;
+	if (new_position.x >= gs.width) new_position.x = gs.width - 1;
+	if (new_position.y < 0) new_position.y = 0;
+	if (new_position.y >= gs.height) new_position.y = gs.height - 1;
+
 	cout << "pos " << new_position.x << " " << new_position.y << " " << gs.block_index(new_position) << endl;
 
 	new_gs.players[i].position = new_position;

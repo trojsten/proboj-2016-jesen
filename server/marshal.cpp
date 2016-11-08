@@ -11,6 +11,14 @@ template<> void nacitaj<int>(istream& buf, int& out) {
     buf >> out;
 }
 
+template<> void uloz<bool>(ostream& buf, const bool& in) {
+    buf << in << " ";
+}
+
+template<> void nacitaj<bool>(istream& buf, bool& out) {
+    buf >> out;
+}
+
 template<> void uloz<direction>(std::ostream& out, const direction& in) {
     uloz(out, (const int &)in);
 }

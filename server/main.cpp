@@ -138,6 +138,8 @@ int main(int argc, char *argv[]) {
     gm.squares[2][8] = SPAWN;
     gm.squares[8][8] = SPAWN;
     gm.squares[8][2] = SPAWN;
+    observationstream << gm.width << " " << gm.height << endl;
+
     game_state gs(pocet_hracov, gm);
 
     // ABSENT: nacitame mapu
