@@ -18,7 +18,7 @@ using namespace std;
 #include "marshal.h"
 
 const auto MAX_CITAJ = 1024;
-const auto ROUND_TIME = 1000;
+const auto ROUND_TIME = 100;
 
 vector<Klient> klienti;
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     if (!jeAdresar(zaznAdr)) {
 	if (mkdir(zaznAdr.c_str(), 0777)) {
 	    fprintf(stderr, "main/mkdir: %s: %s\n", zaznAdr.c_str(), strerror(errno));
-	    exit(EXIT_FAILURE);
+	    exit(1);
 	}
     } else {
 	fprintf(stderr, "main: prepisujem zaznamovy adresar: %s\n", zaznAdr.c_str());
@@ -128,21 +128,31 @@ int main(int argc, char *argv[]) {
 
 	observationstream << meno << " " << farba << endl;
     }
-	
-    for (unsigned k = 0; k < klienti.size(); k++) {
-	klienti[k].restartuj();
-    }
 
+    // nacitame mapu
+    if (!jeSubor(argv[2])) {
+        fprintf(stderr, "nepodarilo sa nacitat mapu\n");
+        exit(1);
+    }
+    fstream mapstream(argv[2], fstream::in);
+    game_map gm;
+    gm.load(mapstream);
+    mapstream.close();
+    /*
     game_map gm(10, 10);
     gm.squares[2][2] = SPAWN;
     gm.squares[2][8] = SPAWN;
     gm.squares[8][8] = SPAWN;
     gm.squares[8][2] = SPAWN;
+    */
     observationstream << gm.width << " " << gm.height << endl;
 
     game_state gs(pocet_hracov, gm);
 
-    // ABSENT: nacitame mapu
+    // spusti klientov
+    for (unsigned k = 0; k < klienti.size(); k++) {
+	klienti[k].restartuj();
+    }
 
     // ABSENT: zakoduje pociatocny stav a posle ho
     // potom pocka chvilu --- cas na predpocitanie
@@ -151,70 +161,81 @@ int main(int argc, char *argv[]) {
     long long lasttime = gettime();
 
     bool koncim = false;
+    int tah = 0;
     while (!koncim) {
-	vector<vector<player_command>> commands(klienti.size());
+        cerr << "tah " << tah << "\n";
+        tah++;
+	vector<vector<player_command> > commands(klienti.size());
 
 	while (gettime() - lasttime < ROUND_TIME) {
 	    // fetchujeme spravy klientov, ale este nesimulujeme kolo
 	    for (unsigned k = 0; k < klienti.size(); k++) {
-		if (!klienti[k].zije()) {
-		    klienti[k].restartuj();
-		    // klientovi posleme relevantne data
-		    // klienti[k].posli("blablabla");
-		    continue;
-		}
+            if (!gs.players[k].alive) {
+                continue;
+            }
+            if (!klienti[k].zije()) {
+                klienti[k].restartuj();
+                // klientovi posleme relevantne data
+                // klienti[k].posli("blablabla");
+                continue;
+            }
 
-		stringstream riadky(klienti[k].citaj(MAX_CITAJ));
+            stringstream riadky(klienti[k].citaj(MAX_CITAJ));
 
-		while (true) {
-		    string cmd;
-		    riadky >> cmd;
-		    if (riadky.eof()) break;
+            while (true) {
+                string cmd;
+                riadky >> cmd;
+                if (riadky.eof()) break;
 
-		    if (cmd == "cd") {
-			string dir;
-			riadky >> dir;
-			if (riadky.eof()) {
-			    cerr << "wrong input " << k << ": no dir after cd" << endl;
-			    continue;
-			}
+                if (cmd == "cd") {
+                string dir;
+                riadky >> dir;
+                if (riadky.eof()) {
+                    cerr << "wrong input " << k << ": no dir after cd" << endl;
+                    continue;
+                }
 
-			if (dir == "LEFT") {
-			    commands[k].push_back(player_command{LEFT});
-			} else if (dir == "RIGHT") {
-			    commands[k].push_back(player_command{RIGHT});
-			} else if (dir == "UP") {
-			    commands[k].push_back(player_command{UP});
-			} else if (dir == "DOWN") {
-			    commands[k].push_back(player_command{DOWN});
-			} else {
-			    cerr << "wrong input " << k << ": invalid dir '" << dir << "'" << endl;
-			}
-		    } else {
-			cerr << "wrong input " << k << ": no such cmd '" << cmd << "'" << endl;
-		    }
-		}
+                if (dir == "LEFT") {
+                    commands[k].push_back(player_command{LEFT});
+                } else if (dir == "RIGHT") {
+                    commands[k].push_back(player_command{RIGHT});
+                } else if (dir == "UP") {
+                    commands[k].push_back(player_command{UP});
+                } else if (dir == "DOWN") {
+                    commands[k].push_back(player_command{DOWN});
+                } else {
+                    cerr << "wrong input " << k << ": invalid dir '" << dir << "'" << endl;
+                }
+                } else {
+                    cerr << "wrong input " << k << ": no such cmd '" << cmd << "'" << endl;
+                }
+            }
 	    }
 	}
 	lasttime = gettime();
 
-	cout << "YAY" << endl;
 	gs = update_game_state(gs, commands);
-	cout << "NAY" << endl;
-
+    
+    // zabijeme mrtvych hracov
+    for (unsigned k = 0; k < klienti.size(); k++) {
+        if (!gs.players[k].alive) {
+            klienti[k].zabi();
+        }
+    }
+    
 	stringstream state_str;
 	uloz(state_str, gs);
 
 	for (unsigned k = 0; k < klienti.size(); k++) {
+        if (!klienti[k].zije()) {
+            continue;
+        }
 	    if (commands[k].size() > 0) {
-		klienti[k].posli(state_str.str());
+            klienti[k].posli(state_str.str());
 	    }
 	}
 
 	observationstream << state_str.str() << endl;
-
-	// dame do zaznamu co treba
-	// observationstream << "blablabla" << flush;
     }
 	
     // cleanup

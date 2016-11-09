@@ -4,10 +4,12 @@ using namespace std;
 #include "klient.h"
 #include "util.h"
 
+#define CAS_DO_RESTARTU 1000
+
 Klient::Klient () {}
 
 Klient::Klient (string _meno, string _uvodneData, string adresar, string execCommand, string zaznamovyAdresar)
-    : meno(_meno), uvodneData(_uvodneData)
+    : meno(_meno), uvodneData(_uvodneData), poslRestart(-1)
 {
     vector<string> command;
     command.push_back(execCommand);
@@ -18,12 +20,15 @@ Klient::Klient (string _meno, string _uvodneData, string adresar, string zaznamo
     : Klient(_meno, _uvodneData, adresar, "./hrac", zaznamovyAdresar) {}
 
 void Klient::restartuj () {
-    // este nemame policy na to, ako casto mozno resetovat klienta
-    // moze byt problem s prilis castym resetovanim
-    precitane.clear();
-    proces.restartuj();
+    long long cas = gettime();
+    if (cas - poslRestart > CAS_DO_RESTARTU) {
+        loguj("restartujem klienta %s", meno.c_str());
+        precitane.clear();
+        proces.restartuj();
 
-    posli(uvodneData);
+        posli(uvodneData);
+        poslRestart = cas;
+    }
 }
 
 string Klient::citaj (unsigned cap) {
