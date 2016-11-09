@@ -1,9 +1,11 @@
-main.o: main.cpp util.h common.h mapa.h update.h klient.h proces.h \
- marshal.h
+main.o: main.cpp util.h common.h marshal.h mapa.h update.h klient.h \
+ proces.h
 
 util.h:
 
 common.h:
+
+marshal.h:
 
 mapa.h:
 
@@ -12,5 +14,3 @@ update.h:
 klient.h:
 
 proces.h:
-
-marshal.h:
