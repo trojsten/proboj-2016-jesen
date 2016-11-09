@@ -113,15 +113,17 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
         if (new_gs.players[i].position.x < 0 || new_gs.players[i].position.x >= new_gs.width) {
             new_gs = kill_player(new_gs, i);
         }
+        else
         if (new_gs.players[i].position.y < 0 || new_gs.players[i].position.y >= new_gs.height) {
             new_gs = kill_player(new_gs, i);
         }
-        
-        // nezabili sme prave niekoho?
-        block curr = gs.blocks[gs.block_index(new_gs.players[i].position)];
-        if (curr.crossed_by != -1) {
-            if (curr.owned_by != curr.crossed_by) {
-                kill_player(new_gs, curr.crossed_by);
+        else {
+            // nezabili sme prave niekoho?
+            block curr = gs.blocks[gs.block_index(new_gs.players[i].position)];
+            if (curr.crossed_by != -1) {
+                if (curr.owned_by != curr.crossed_by) {
+                    kill_player(new_gs, curr.crossed_by);
+                }
             }
         }
     }

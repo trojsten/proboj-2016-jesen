@@ -18,7 +18,7 @@ using namespace std;
 #include "marshal.h"
 
 const auto MAX_CITAJ = 1024;
-const auto ROUND_TIME = 100;
+const auto ROUND_TIME = 40;
 
 vector<Klient> klienti;
 
