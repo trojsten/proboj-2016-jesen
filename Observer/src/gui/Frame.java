@@ -329,6 +329,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                 if(botLogReaders.get(i) == null)continue;
                 try {
                     String s = botLogReaders.get(i).readLine();
+                    if(s == null){throw new IOException();}
                     while (s.startsWith(NEXT_TURN_LOG) == false) {
                         botLogs.get(i).setText(botLogs.get(i).getText() + String.format("[Tah %d] %s\n", roundNumber, s));
                     }
