@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 
+#include "marshal.h"
 #include "mapa.h"
 
 using namespace std;

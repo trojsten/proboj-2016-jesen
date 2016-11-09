@@ -26,7 +26,7 @@ game_state::game_state(int num_players, game_map gm) {
 
 	for (int x = -1; x <= 1; x++) {
 	    for (int y = -1; y <= 1; y++) {
-		this->blocks[i].owned_by = i;
+		this->blocks[this->block_index({pos.x + x, pos.y + y})].owned_by = i;
 	    }
 	}
     }
