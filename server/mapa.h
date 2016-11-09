@@ -18,7 +18,7 @@ struct game_map {
 
     game_map(int width, int height);
     
-    void load (fstream& mapfile) ;
+    bool load (string filename) ;
 };
 
 #endif

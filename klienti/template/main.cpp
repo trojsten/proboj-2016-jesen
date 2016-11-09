@@ -5,7 +5,12 @@
 
 using namespace std;
 
+int ja = -1;
+
 int main() {
+    string str;
+    cin >> str >> ja;
+    
     game_state gs;
 
     while (true) {

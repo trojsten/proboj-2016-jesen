@@ -130,14 +130,10 @@ int main(int argc, char *argv[]) {
     }
 
     // nacitame mapu
-    if (!jeSubor(argv[2])) {
-	fprintf(stderr, "nepodarilo sa nacitat mapu\n");
-	exit(1);
-    }
-    fstream mapstream(argv[2], fstream::in);
     game_map gm;
-    gm.load(mapstream);
-    mapstream.close();
+    if (!gm.load(argv[2])) {
+        exit(1);
+    }
     /*
       game_map gm(10, 10);
       gm.squares[2][2] = SPAWN;
