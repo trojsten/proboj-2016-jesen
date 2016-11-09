@@ -239,7 +239,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                     botLogs.get(i).setText("--NEEXISTUJE LOG!--\n");
                 } catch (IOException ex) {
                     botLogs.get(i).setText(botLogs.get(i).getText() + String.format("--KONIEC BOT LOGU!--\n"));
-                    botLogs.set(i, null);
+                    botLogReaders.set(i, null);
                 }
             }
         }
