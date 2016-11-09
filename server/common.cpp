@@ -23,5 +23,11 @@ game_state::game_state(int num_players, game_map gm) {
 	point pos = {spawns[i].first, spawns[i].second};
 	this->players.push_back(player{pos, UP, true, 0});
 	this->blocks[this->block_index(pos)].crossed_by = i;
+
+	for (int x = -1; x <= 1; x++) {
+	    for (int y = -1; y <= 1; y++) {
+		this->blocks[i].owned_by = i;
+	    }
+	}
     }
 }
