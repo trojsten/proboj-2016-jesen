@@ -8,6 +8,10 @@ using namespace std;
 int main() {
     game_state gs;
 
+    string tmp;
+    int hrac;
+    cin >> tmp >> hrac;
+
     while (true) {
 	nacitaj(cin, gs);
         cout << "cd " << "LEFT" << endl;
