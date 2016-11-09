@@ -48,7 +48,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     private int MAX_SLEEP_TIME = 3000;
     private int SLEEP_UNIT = 20;
     public static final Font RESULTS_FONT = new Font("Noto Sans", Font.PLAIN, 20);
-    private String DELIMETER_LINE = "+++++";
+    private String NEXT_TURN_LOG = "TAH ";
 
     public Frame() {
         initAll();
@@ -138,6 +138,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     ArrayList<ArrayList<Integer>> playerPoints;
     ArrayList<BufferedReader> botLogReaders;
     String filename = null;
+    int roundNumber=0;
     Scanner in;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -223,17 +224,22 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                 try {
                     BufferedReader read = new BufferedReader(new FileReader(Paths.get(filename, botNames.get(i) + ".log").toFile()));
                     botLogReaders.add(read);
+                    //read the frist line
+                    read.readLine();
                     while (true) {
                         String line = read.readLine();
-                        if (line.equals(DELIMETER_LINE)) {
+                        if (line.startsWith(NEXT_TURN_LOG)) {
+                            roundNumber = parseRound(line);
                             break;
                         }
-                        botLogs.get(i).setText(botLogs.get(i).getText() + line+"\n");
+                        botLogs.get(i).setText(String.format("[Tah %d] %s\n", roundNumber, botLogs.get(i).getText() + line));
                     }
                 } catch (FileNotFoundException ex) {
-                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    botLogs.get(i).setText("--NEEXISTUJE LOG!--\n");
+                    botLogs.set(i, null);
                 } catch (IOException ex) {
-                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    botLogs.get(i).setText(botLogs.get(i).getText() + String.format("--KONIEC BOT LOGU!--\n"));
+                    botLogs.set(i, null);
                 }
             }
         }
@@ -310,7 +316,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
             }
 
             //read map
-            in.nextInt(); //miso prints num of elements in vvector 
+            in.nextInt(); //miso prints num of elements in 
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < M; j++) {
                     whoseArea[i][j] = in.nextInt();
@@ -322,11 +328,14 @@ public class Frame extends javax.swing.JFrame implements Runnable {
             for (int i = 0; i < numBots; i++) {
                 try {
                     String s;
-                    while (!(s = botLogReaders.get(i).readLine()).equals(DELIMETER_LINE)) {
-                        botLogs.get(i).setText(botLogs.get(i).getText() + s+"\n");
+                    while (!(s = botLogReaders.get(i).readLine()).startsWith(NEXT_TURN_LOG)) {
+                        botLogs.get(i).setText(String.format("[Tah %d] %s\n", roundNumber, botLogs.get(i).getText() + s));
                     }
+                    roundNumber = parseRound(s);
                 } catch (IOException ex) {
-                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    botLogReaders.set(i, null);
+                    botLogs.get(i).setText(botLogs.get(i).getText() + String.format("--KONIEC BOT LOGU!--\n"));
+                    //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -373,6 +382,10 @@ public class Frame extends javax.swing.JFrame implements Runnable {
         bindKeys();
 
         startThread();
+    }
+
+    private int parseRound(String s) {
+        return Integer.parseInt(s.split(" ")[1]);
     }
 
     private static class MyTableCellRenderer extends DefaultTableCellRenderer {
