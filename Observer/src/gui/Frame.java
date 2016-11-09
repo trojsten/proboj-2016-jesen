@@ -233,7 +233,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                             roundNumber = parseRound(line);
                             break;
                         }
-                        botLogs.get(i).setText(String.format("[Tah %d] %s\n", roundNumber, botLogs.get(i).getText() + line));
+                        botLogs.get(i).setText(botLogs.get(i).getText() + String.format("[Tah %d] %s\n", roundNumber, line));
                     }
                 } catch (FileNotFoundException ex) {
                     botLogs.get(i).setText("--NEEXISTUJE LOG!--\n");
@@ -330,7 +330,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                 try {
                     String s;
                     while (!(s = botLogReaders.get(i).readLine()).startsWith(NEXT_TURN_LOG)) {
-                        botLogs.get(i).setText(String.format("[Tah %d] %s\n", roundNumber, botLogs.get(i).getText() + s));
+                        botLogs.get(i).setText(botLogs.get(i).getText() + String.format("[Tah %d] %s\n", roundNumber, s));
                     }
                     roundNumber = parseRound(s);
                 } catch (IOException ex) {
