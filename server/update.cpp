@@ -27,21 +27,7 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             continue;
         }
         if (!commands[i].empty()) {
-            // dovolime len otacanie o 90 stupnov
-            direction new_dir = commands[i].back().dir;
-            if (gs.players[i].dir == LEFT && new_dir == RIGHT) {
-                continue;
-            }
-            if (gs.players[i].dir == RIGHT && new_dir == LEFT) {
-                continue;
-            }
-            if (gs.players[i].dir == UP && new_dir == DOWN) {
-                continue;
-            }
-            if (gs.players[i].dir == DOWN && new_dir == UP) {
-                continue;
-            }
-            new_gs.players[i].dir = new_dir;
+            new_gs.players[i].dir = commands[i].back().dir;
         }
     }
     
