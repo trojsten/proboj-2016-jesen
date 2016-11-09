@@ -20,11 +20,12 @@ int Proces::getPid() {
 void Proces::write (string data) {
     unsigned cur = 0;
     while (cur < data.size()) {
-        unsigned wlen = data.size() - cur;
-        int status = ::write(writefd, data.c_str()+cur, wlen);
+        int wlen = 1024;
+        if (cur + wlen > data.size()) wlen = data.size() - cur;
+        int status = ::write(writefd, data.c_str() + cur, wlen);
         if (status != (int) wlen) {
             if (status == -1) {
-                // fprintf(stderr, "write: pid %d: %s\n", pid, strerror(errno));
+                fprintf(stderr, "write: pid %d: %s\n", pid, strerror(errno));
             }
             else {
                 fprintf(stderr, "write: pid %d: zapisali sme len %d bajtov z %d\n", pid, status, wlen);
@@ -84,7 +85,10 @@ void Proces::restartuj () {
 
     int flags = fcntl(child2parent[0], F_GETFL);
     fcntl(child2parent[0], F_SETFL, flags | O_NONBLOCK);
-
+    
+    int flags2 = fcntl(parent2child[1], F_GETFL);
+    fcntl(parent2child[1], F_SETFL, flags2 | O_NONBLOCK);
+    
     int status = fork();
     if (status == -1) {
         fprintf(stderr, "restartuj/fork: pid %d: %s\n", pid, strerror(errno));
@@ -111,7 +115,7 @@ void Proces::restartuj () {
         close(child2parent[1]);
         if (chdir(cwd.c_str()) == -1) {
             fprintf(stderr, "restartuj/chdir: %s: %s\n", cwd.c_str(), strerror(errno));
-            exit(EXIT_FAILURE);
+            exit(1);
         }
         char** _args = (char**) calloc(args.size() + 1, sizeof(char*));
         for (unsigned i = 0; i < args.size(); i++) _args[i] = (char*)args[i].c_str();

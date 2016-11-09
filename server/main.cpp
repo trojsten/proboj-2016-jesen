@@ -18,7 +18,7 @@ using namespace std;
 #include "marshal.h"
 
 const auto MAX_CITAJ = 1024;
-const auto ROUND_TIME = 1000;
+const auto ROUND_TIME = 10;
 
 vector<Klient> klienti;
 
@@ -133,6 +133,7 @@ int main(int argc, char *argv[]) {
 	klienti[k].restartuj();
     }
 
+    // nacitame mapu
     game_map gm(10, 10);
     gm.squares[2][2] = SPAWN;
     gm.squares[2][8] = SPAWN;
@@ -151,56 +152,59 @@ int main(int argc, char *argv[]) {
     long long lasttime = gettime();
 
     bool koncim = false;
+    int tah = 0;
     while (!koncim) {
-	vector<vector<player_command>> commands(klienti.size());
+        cerr << "tah " << tah << "\n";
+        tah++;
+	vector<vector<player_command> > commands(klienti.size());
 
 	while (gettime() - lasttime < ROUND_TIME) {
 	    // fetchujeme spravy klientov, ale este nesimulujeme kolo
 	    for (unsigned k = 0; k < klienti.size(); k++) {
-		if (!klienti[k].zije()) {
-		    klienti[k].restartuj();
-		    // klientovi posleme relevantne data
-		    // klienti[k].posli("blablabla");
-		    continue;
-		}
+            if (!klienti[k].zije()) {
+                klienti[k].restartuj();
+                // klientovi posleme relevantne data
+                // klienti[k].posli("blablabla");
+                continue;
+            }
 
-		stringstream riadky(klienti[k].citaj(MAX_CITAJ));
+            stringstream riadky(klienti[k].citaj(MAX_CITAJ));
 
-		while (true) {
-		    string cmd;
-		    riadky >> cmd;
-		    if (riadky.eof()) break;
+            while (true) {
+                string cmd;
+                riadky >> cmd;
+                if (riadky.eof()) break;
 
-		    if (cmd == "cd") {
-			string dir;
-			riadky >> dir;
-			if (riadky.eof()) {
-			    cerr << "wrong input " << k << ": no dir after cd" << endl;
-			    continue;
-			}
+                if (cmd == "cd") {
+                string dir;
+                riadky >> dir;
+                if (riadky.eof()) {
+                    cerr << "wrong input " << k << ": no dir after cd" << endl;
+                    continue;
+                }
 
-			if (dir == "LEFT") {
-			    commands[k].push_back(player_command{LEFT});
-			} else if (dir == "RIGHT") {
-			    commands[k].push_back(player_command{RIGHT});
-			} else if (dir == "UP") {
-			    commands[k].push_back(player_command{UP});
-			} else if (dir == "DOWN") {
-			    commands[k].push_back(player_command{DOWN});
-			} else {
-			    cerr << "wrong input " << k << ": invalid dir '" << dir << "'" << endl;
-			}
-		    } else {
-			cerr << "wrong input " << k << ": no such cmd '" << cmd << "'" << endl;
-		    }
-		}
+                if (dir == "LEFT") {
+                    commands[k].push_back(player_command{LEFT});
+                } else if (dir == "RIGHT") {
+                    commands[k].push_back(player_command{RIGHT});
+                } else if (dir == "UP") {
+                    commands[k].push_back(player_command{UP});
+                } else if (dir == "DOWN") {
+                    commands[k].push_back(player_command{DOWN});
+                } else {
+                    cerr << "wrong input " << k << ": invalid dir '" << dir << "'" << endl;
+                }
+                } else {
+                    cerr << "wrong input " << k << ": no such cmd '" << cmd << "'" << endl;
+                }
+            }
 	    }
 	}
 	lasttime = gettime();
 
-	cout << "YAY" << endl;
+	// cout << "YAY" << endl;
 	gs = update_game_state(gs, commands);
-	cout << "NAY" << endl;
+	// cout << "NAY" << endl;
 
 	stringstream state_str;
 	uloz(state_str, gs);

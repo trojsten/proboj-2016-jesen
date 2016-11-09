@@ -9,6 +9,7 @@ class Klient {
         std::string uvodneData;
         Proces proces;
         std::string precitane;
+        long long poslRestart;
 
     public:
         Klient () ;
