@@ -225,9 +225,10 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                     BufferedReader read = new BufferedReader(new FileReader(Paths.get(filename, botNames.get(i) + ".log").toFile()));
                     botLogReaders.add(read);
                     //read the frist line
-                    read.readLine();
+                    if(read.readLine() == null){throw new IOException();}
                     while (true) {
                         String line = read.readLine();
+                        if(line == null){throw new IOException();}  
                         if (line.startsWith(NEXT_TURN_LOG)) {
                             roundNumber = parseRound(line);
                             break;
@@ -236,7 +237,6 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                     }
                 } catch (FileNotFoundException ex) {
                     botLogs.get(i).setText("--NEEXISTUJE LOG!--\n");
-                    botLogs.set(i, null);
                 } catch (IOException ex) {
                     botLogs.get(i).setText(botLogs.get(i).getText() + String.format("--KONIEC BOT LOGU!--\n"));
                     botLogs.set(i, null);
@@ -326,6 +326,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
 
             //read logs
             for (int i = 0; i < numBots; i++) {
+                if(botLogs.get(i) == null)continue;
                 try {
                     String s;
                     while (!(s = botLogReaders.get(i).readLine()).startsWith(NEXT_TURN_LOG)) {
