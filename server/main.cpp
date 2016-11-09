@@ -18,7 +18,7 @@ using namespace std;
 #include "marshal.h"
 
 const auto MAX_CITAJ = 1024;
-const auto ROUND_TIME = 10;
+const auto ROUND_TIME = 100;
 
 vector<Klient> klienti;
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     if (!jeAdresar(zaznAdr)) {
 	if (mkdir(zaznAdr.c_str(), 0777)) {
 	    fprintf(stderr, "main/mkdir: %s: %s\n", zaznAdr.c_str(), strerror(errno));
-	    exit(EXIT_FAILURE);
+	    exit(1);
 	}
     } else {
 	fprintf(stderr, "main: prepisujem zaznamovy adresar: %s\n", zaznAdr.c_str());
@@ -128,22 +128,31 @@ int main(int argc, char *argv[]) {
 
 	observationstream << meno << " " << farba << endl;
     }
-	
-    for (unsigned k = 0; k < klienti.size(); k++) {
-	klienti[k].restartuj();
-    }
 
     // nacitame mapu
+    if (!jeSubor(argv[2])) {
+        fprintf(stderr, "nepodarilo sa nacitat mapu\n");
+        exit(1);
+    }
+    fstream mapstream(argv[2], fstream::in);
+    game_map gm;
+    gm.load(mapstream);
+    mapstream.close();
+    /*
     game_map gm(10, 10);
     gm.squares[2][2] = SPAWN;
     gm.squares[2][8] = SPAWN;
     gm.squares[8][8] = SPAWN;
     gm.squares[8][2] = SPAWN;
+    */
     observationstream << gm.width << " " << gm.height << endl;
 
     game_state gs(pocet_hracov, gm);
 
-    // ABSENT: nacitame mapu
+    // spusti klientov
+    for (unsigned k = 0; k < klienti.size(); k++) {
+	klienti[k].restartuj();
+    }
 
     // ABSENT: zakoduje pociatocny stav a posle ho
     // potom pocka chvilu --- cas na predpocitanie
@@ -161,6 +170,9 @@ int main(int argc, char *argv[]) {
 	while (gettime() - lasttime < ROUND_TIME) {
 	    // fetchujeme spravy klientov, ale este nesimulujeme kolo
 	    for (unsigned k = 0; k < klienti.size(); k++) {
+            if (!gs.players[k].alive) {
+                continue;
+            }
             if (!klienti[k].zije()) {
                 klienti[k].restartuj();
                 // klientovi posleme relevantne data
@@ -202,23 +214,28 @@ int main(int argc, char *argv[]) {
 	}
 	lasttime = gettime();
 
-	// cout << "YAY" << endl;
 	gs = update_game_state(gs, commands);
-	// cout << "NAY" << endl;
-
+    
+    // zabijeme mrtvych hracov
+    for (unsigned k = 0; k < klienti.size(); k++) {
+        if (!gs.players[k].alive) {
+            klienti[k].zabi();
+        }
+    }
+    
 	stringstream state_str;
 	uloz(state_str, gs);
 
 	for (unsigned k = 0; k < klienti.size(); k++) {
+        if (!klienti[k].zije()) {
+            continue;
+        }
 	    if (commands[k].size() > 0) {
-		klienti[k].posli(state_str.str());
+            klienti[k].posli(state_str.str());
 	    }
 	}
 
 	observationstream << state_str.str() << endl;
-
-	// dame do zaznamu co treba
-	// observationstream << "blablabla" << flush;
     }
 	
     // cleanup

@@ -9,11 +9,9 @@ int main() {
     cout << 5/a;
     */
     while (true) {
-        /*
         string str;
         cin >> str;
-        */
         cout << "cd " << "LEFT" << endl;
-        cout << "cd " << "RIGHT" << endl;
+        cout << "cd " << "UP" << endl;
     }
 }
