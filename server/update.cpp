@@ -16,18 +16,25 @@ void kill_player(game_state& gs, int dier) {
     }
 }
 
-void own_body(game_state& gs, int player) {
+int own_body(game_state& gs, int player) {
+    int points = 0;
+
     // mark all crossed blocks as owned
     for (unsigned i = 0; i < gs.blocks.size(); i++) {
 	if (gs.blocks[i].crossed_by == player) {
+	    if (gs.blocks[i].owned_by != player) points++;
 	    gs.blocks[i].owned_by = player;
 	    gs.blocks[i].crossed_by = -1;
 	}
     }
+
+    return points;
 }
 
-void own_territory(game_state& gs, int player) {
-    own_body(gs, player);
+int own_territory(game_state& gs, int player) {
+    int points = 0;
+
+    points += own_body(gs, player);
 
     vector<bool> visited(gs.blocks.size(), false);
     for (int x = 0; x < gs.width; x++) {
@@ -68,15 +75,17 @@ void own_territory(game_state& gs, int player) {
 		for (unsigned i = 0; i < gs.blocks.size(); i++) {
 		    if (tested[i]) {
 			gs.blocks[i].owned_by = player;
+			points++;
 		    }
 		}
 	    }
 	}
     }
+
+    return points;
 }
 
 game_state update_game_state(game_state gs, vector<vector<player_command> > commands) {
-    
     // pre kazdeho z hracov zistime jeho novy smer
     for (unsigned i = 0; i < gs.players.size(); i++) {
         if (!gs.players[i].alive) {
@@ -88,18 +97,15 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
     }
     
     for (int turbo_step = 1; turbo_step >= 0; turbo_step--) {
-        // step == 0: hybu sa len turbo hraci
-        // step == 1: hybu sa vsetci hraci
+        // turbo_step == 1: hybu sa len turbo hraci
+        // turbo_step == 0: hybu sa vsetci hraci
         game_state new_gs = gs;
         
         // zistime novu poziciu kazdeho hraca
         for (unsigned i = 0; i < gs.players.size(); i++) {
-            if (!gs.players[i].alive) {
-                continue;
-            }
-            if (turbo_step && gs.players[i].turbo <= 0) {
-                continue;
-            }
+            if (!gs.players[i].alive) continue;
+            if (turbo_step && gs.players[i].turbo <= 0) continue;
+	    
             point new_position = new_gs.players[i].position;
             switch (new_gs.players[i].dir) {
             case LEFT:
@@ -120,18 +126,15 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
 
         // zistime, ci sa nezrazili
         for (unsigned i = 0; i < new_gs.players.size(); i++) {
-            if (!gs.players[i].alive) {
-                continue;
-            }
+            if (!new_gs.players[i].alive) continue;
+	    if (turbo_step && new_gs.players[i].turbo <= 0) continue;
+
             // nezabil sa o stenu / okraj mapy?
             if (new_gs.players[i].position.x < 0 || new_gs.players[i].position.x >= new_gs.width) {
                 kill_player(new_gs, i);
-            }
-            else
-            if (new_gs.players[i].position.y < 0 || new_gs.players[i].position.y >= new_gs.height) {
+            } else if (new_gs.players[i].position.y < 0 || new_gs.players[i].position.y >= new_gs.height) {
                 kill_player(new_gs, i);
-            }
-            else {
+            } else {
                 // nezabili sme prave niekoho?
                 block curr = gs.blocks[gs.block_index(new_gs.players[i].position)];
                 if (curr.crossed_by != -1) {
@@ -154,7 +157,7 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
         
         // zistime celne zrazky
         for (unsigned i = 0; i < new_gs.players.size(); i++) {
-            if (!gs.players[i].alive) {
+            if (!new_gs.players[i].alive) {
                 continue;
             }
             for (unsigned j = 0; j < new_gs.players.size(); j++) {
@@ -176,9 +179,6 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             if (!new_gs.players[i].alive) {
                 continue;
             }
-            if (turbo_step && new_gs.players[i].turbo <= 0) {
-                continue;
-            }
             int pos_index = new_gs.block_index(new_gs.players[i].position);
             new_gs.blocks[pos_index].crossed_by = i;
         }
@@ -190,10 +190,10 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             }
             int pos_index = new_gs.block_index(new_gs.players[i].position);
             if (new_gs.blocks[pos_index].owned_by == (int)i) {
-                own_territory(new_gs, (int)i);
+                new_gs.players[i].score += own_territory(new_gs, (int)i);
             }
         }
-        /*
+	
         // kazdy hrac zozerie bonus na svojom policku
         for (unsigned i = 0; i < new_gs.players.size(); i++) {
             if (!new_gs.players[i].alive) {
@@ -209,10 +209,10 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             if (new_gs.blocks[pos_index].type == STONE_BONUS) {
                 new_gs.blocks[pos_index].type = BONUS_SPAWN;
                 // svoje telo premeni na uzemie
-                own_body(new_gs, i);
+                new_gs.players[i].score += own_body(new_gs, i);
             }
         }
-        */
+	
         gs = new_gs;
     }
     
@@ -245,6 +245,8 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             }
         }
     }
+
+    gs.round++;
 
     return gs;
 }

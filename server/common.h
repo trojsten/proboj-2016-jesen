@@ -9,6 +9,8 @@
 
 using namespace std;
 
+const int MAX_ROUNDS = 1000;
+
 enum direction {
     LEFT, RIGHT, UP, DOWN
 };
@@ -23,6 +25,10 @@ struct point {
     bool operator== (const point A) const {
         return x == A.x && y == A.y;
     }
+};
+
+enum square_type {
+    EMPTY, WALL, SPAWN, BONUS_SPAWN, FAST_BONUS, STONE_BONUS
 };
 
 struct block {
@@ -43,7 +49,21 @@ struct player {
     int turbo;
 };
 
+// UCASTNICI: tento struct je pre vas nedolezity
+struct game_map {
+    int width, height;
+    vector<vector<square_type>> squares;
+    
+    game_map(){}
+
+    game_map(int width, int height);
+    
+    bool load (string filename) ;
+};
+
 struct game_state {
+    int round;
+
     int width, height;
 
     vector<player> players;
