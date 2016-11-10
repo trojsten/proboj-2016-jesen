@@ -73,6 +73,11 @@ toho je, že vo vašom území do vášho tela nevie naraziť žiaden iný had
 
 Takisto nechcete, aby váš had nabúral do stien alebo do okraju mapy.
 
+Na mape sa taktiež nachádzajú dva rôzne bonusy. Prvým z nich je
+dvojnásobná rýchlosť na určitú dobu. Druhý spôsobí, že telo vášho
+hada sa okamžite zmení na jeho územie. V momente, keď bonus spapáte,
+ho aj hneď použijete.
+
 Ako sa ťahá
 -----------
 
@@ -93,3 +98,4 @@ a poloviť v komentároch.
 
 Mapy
 ----
+
