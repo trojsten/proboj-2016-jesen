@@ -18,7 +18,7 @@ using namespace std;
 #include "marshal.h"
 
 const auto MAX_CITAJ = 1024;
-const auto ROUND_TIME = 10;
+const auto ROUND_TIME = 40;
 
 vector<Klient> klienti;
 
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
 		if (gs.players[i].alive) remain_alive++;
 	    }
 
-	    if (remain_alive == 1) last_rounds = 8;
+	    if (remain_alive <= 1) last_rounds = 8;
 	} else {
 	    last_rounds -= 1;
 	    if (last_rounds <= 0) break;
