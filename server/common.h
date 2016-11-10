@@ -39,6 +39,8 @@ struct player {
     int score;
 
     //TODO: bonuses
+    
+    int turbo;
 };
 
 struct game_state {
