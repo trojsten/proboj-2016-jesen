@@ -19,6 +19,10 @@ struct player_command {
 
 struct point {
     int x, y;
+    
+    bool operator== (const point A) const {
+        return x == A.x && y == A.y;
+    }
 };
 
 struct block {

@@ -109,13 +109,19 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
 
     // zistime, ci nenarazili do steny
     for (unsigned i = 0; i < new_gs.players.size(); i++) {
-	if (new_gs.get_block(new_gs.players[i].position).type == WALL) {
-	    new_gs = kill_player(new_gs, i);
-	}
+        if (!gs.players[i].alive) {
+            continue;
+        }
+        if (new_gs.get_block(new_gs.players[i].position).type == WALL) {
+            new_gs = kill_player(new_gs, i);
+        }
     }
 
     // zistime, ci sa nezrazili
     for (unsigned i = 0; i < new_gs.players.size(); i++) {
+        if (!gs.players[i].alive) {
+            continue;
+        }
         // nezabil sa o stenu / okraj mapy?
         if (new_gs.players[i].position.x < 0 || new_gs.players[i].position.x >= new_gs.width) {
             new_gs = kill_player(new_gs, i);
@@ -131,6 +137,25 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
                 if (curr.owned_by != curr.crossed_by) {
                     new_gs = kill_player(new_gs, curr.crossed_by);
                 }
+            }
+        }
+    }
+    
+    // zistime celne zrazky
+    for (unsigned i = 0; i < new_gs.players.size(); i++) {
+        if (!gs.players[i].alive) {
+            continue;
+        }
+        for (unsigned j = 0; j < new_gs.players.size(); j++) {
+            if (i == j) {
+                continue;
+            }
+            if (!gs.players[j].alive) {
+                continue;
+            }
+            if (new_gs.players[i].position == new_gs.players[j].position) {
+                new_gs = kill_player(new_gs, i);
+                new_gs = kill_player(new_gs, j);
             }
         }
     }

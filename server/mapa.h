@@ -7,7 +7,7 @@
 using namespace std;
 
 enum square_type {
-    EMPTY, SPAWN, WALL
+    EMPTY, WALL, SPAWN, BONUS_SPAWN, FAST_BONUS, STONE_BONUS
 };
 
 struct game_map {
