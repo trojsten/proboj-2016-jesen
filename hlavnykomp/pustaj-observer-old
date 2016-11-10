@@ -2,16 +2,22 @@
 
 set -e
 cd "`dirname "$0"`"/..
-
+lastmap="zaznamy/000060"
 while true; do
+  sleep 2
   neukazane=`grep -l '^state=displaying$' zaznamy/*.manifest 2>/dev/null | head -n1`
   if [ -z "$neukazane" ]; then
+    gz=$lastmap.tar.gz
+    echo $gz
+    echo "Cakam"
+    #tar -xzvf $gz && ./server/observer.jar $lastmap && rm -rf $lastmap
     sleep 0.5
     continue
   fi
   dir=${neukazane%.manifest}
+  lastmap=$dir
   echo "`date +'%Y-%m-%d %H:%M:%S'`: ukazujem $dir"
-  if ./observer/observer $dir; then
+  if ./server/observer.jar $dir; then
     sed -i 's/^state=displaying$/state=displayed/' $neukazane
     tar czf ${dir}.tar.gz -C zaznamy ${dir#zaznamy/}
     rm -r $dir
