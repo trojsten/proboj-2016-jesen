@@ -305,17 +305,6 @@ def serve_map(id):
             return send_file(path, as_attachment=True)
             
     if not os.path.isfile(path): abort(404)
-    
-@app.route("/pvp")
-def listpvp():
-    html = """
-    stiahnite si <a href='/pvp/arena'>pvparenu</a> a akchcete 
-    tak aj <a href='pvp/spellmaper'>spellmaper</a> do rovnakeho adresara
-    potom cez python 2
-    python pvparena
-    """
-    
-    return html
 
 
 @app.route("/docs")

@@ -155,10 +155,8 @@ int main(int argc, char *argv[]) {
     long long lasttime = gettime();
 
     bool koncim = false;
-    int tah = 0;
-    while (!koncim) {
-	cerr << "tah " << tah << "\n";
-	tah++;
+    while (!koncim && gs.round < MAX_ROUNDS) {
+	cerr << "tah " << gs.round << "\n";
 	vector<vector<player_command> > commands(klienti.size());
 
 	while (gettime() - lasttime < ROUND_TIME) {
