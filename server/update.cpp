@@ -3,7 +3,10 @@
 
 using namespace std;
 
-game_state kill_player(game_state gs, int dier) {
+#define BONUS_PROB 30
+#define TURBO_DURATION 20
+
+void kill_player(game_state& gs, int dier) {
     // delete all crossed blocks
     gs.players[dier].alive = false;
     for (unsigned i = 0; i < gs.blocks.size(); i++) {
@@ -11,10 +14,9 @@ game_state kill_player(game_state gs, int dier) {
 	    gs.blocks[i].crossed_by = -1;
 	}
     }
-    return gs;
 }
 
-game_state own_territory(game_state gs, int player) {
+void own_body(game_state& gs, int player) {
     // mark all crossed blocks as owned
     for (unsigned i = 0; i < gs.blocks.size(); i++) {
 	if (gs.blocks[i].crossed_by == player) {
@@ -22,6 +24,10 @@ game_state own_territory(game_state gs, int player) {
 	    gs.blocks[i].crossed_by = -1;
 	}
     }
+}
+
+void own_territory(game_state& gs, int player) {
+    own_body(gs, player);
 
     vector<bool> visited(gs.blocks.size(), false);
     for (int x = 0; x < gs.width; x++) {
@@ -67,114 +73,178 @@ game_state own_territory(game_state gs, int player) {
 	    }
 	}
     }
-
-    return gs;
 }
 
 game_state update_game_state(game_state gs, vector<vector<player_command> > commands) {
-    game_state new_gs = gs;
-
+    
     // pre kazdeho z hracov zistime jeho novy smer
     for (unsigned i = 0; i < gs.players.size(); i++) {
         if (!gs.players[i].alive) {
             continue;
         }
         if (!commands[i].empty()) {
-            new_gs.players[i].dir = commands[i].back().dir;
+            gs.players[i].dir = commands[i].back().dir;
         }
     }
     
-    // zistime novu poziciu kazdeho hraca
+    for (int turbo_step = 1; turbo_step >= 0; turbo_step--) {
+        // step == 0: hybu sa len turbo hraci
+        // step == 1: hybu sa vsetci hraci
+        game_state new_gs = gs;
+        
+        // zistime novu poziciu kazdeho hraca
+        for (unsigned i = 0; i < gs.players.size(); i++) {
+            if (!gs.players[i].alive) {
+                continue;
+            }
+            if (turbo_step && gs.players[i].turbo <= 0) {
+                continue;
+            }
+            point new_position = new_gs.players[i].position;
+            switch (new_gs.players[i].dir) {
+            case LEFT:
+                new_position.x -= 1;
+                break;
+            case RIGHT:
+                new_position.x += 1;
+                break;
+            case UP:
+                new_position.y -= 1;
+                break;
+            case DOWN:
+                new_position.y += 1;
+                break;
+            }
+            new_gs.players[i].position = new_position;
+        }
+
+        // zistime, ci sa nezrazili
+        for (unsigned i = 0; i < new_gs.players.size(); i++) {
+            if (!gs.players[i].alive) {
+                continue;
+            }
+            // nezabil sa o stenu / okraj mapy?
+            if (new_gs.players[i].position.x < 0 || new_gs.players[i].position.x >= new_gs.width) {
+                kill_player(new_gs, i);
+            }
+            else
+            if (new_gs.players[i].position.y < 0 || new_gs.players[i].position.y >= new_gs.height) {
+                kill_player(new_gs, i);
+            }
+            else {
+                // nezabili sme prave niekoho?
+                block curr = gs.blocks[gs.block_index(new_gs.players[i].position)];
+                if (curr.crossed_by != -1) {
+                    if (curr.owned_by != curr.crossed_by) {
+                        kill_player(new_gs, curr.crossed_by);
+                    }
+                }
+            }
+        }
+        
+        // zistime, ci nenarazili do steny
+        for (unsigned i = 0; i < new_gs.players.size(); i++) {
+            if (!new_gs.players[i].alive) {
+                continue;
+            }
+            if (new_gs.get_block(new_gs.players[i].position).type == WALL) {
+                kill_player(new_gs, i);
+            }
+        }
+        
+        // zistime celne zrazky
+        for (unsigned i = 0; i < new_gs.players.size(); i++) {
+            if (!gs.players[i].alive) {
+                continue;
+            }
+            for (unsigned j = 0; j < new_gs.players.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+                if (!gs.players[j].alive) {
+                    continue;
+                }
+                if (new_gs.players[i].position == new_gs.players[j].position) {
+                    kill_player(new_gs, i);
+                    kill_player(new_gs, j);
+                }
+            }
+        }
+        
+        // kazdy hrac obsadi svoje policko
+        for (unsigned i = 0; i < new_gs.players.size(); i++) {
+            if (!new_gs.players[i].alive) {
+                continue;
+            }
+            if (turbo_step && new_gs.players[i].turbo <= 0) {
+                continue;
+            }
+            int pos_index = new_gs.block_index(new_gs.players[i].position);
+            new_gs.blocks[pos_index].crossed_by = i;
+        }
+
+        // zistime, ci hrac neobsadil uzemie
+        for (unsigned i = 0; i < new_gs.players.size(); i++) {
+            if (!new_gs.players[i].alive) {
+                continue;
+            }
+            int pos_index = new_gs.block_index(new_gs.players[i].position);
+            if (new_gs.blocks[pos_index].owned_by == (int)i) {
+                own_territory(new_gs, (int)i);
+            }
+        }
+        /*
+        // kazdy hrac zozerie bonus na svojom policku
+        for (unsigned i = 0; i < new_gs.players.size(); i++) {
+            if (!new_gs.players[i].alive) {
+                continue;
+            }
+            int pos_index = new_gs.block_index(new_gs.players[i].position);
+            if (new_gs.blocks[pos_index].type == FAST_BONUS) {
+                new_gs.blocks[pos_index].type = BONUS_SPAWN;
+                // ziska dvojnasobnu rychlost
+                gs.players[i].turbo += TURBO_DURATION;
+            }
+            else
+            if (new_gs.blocks[pos_index].type == STONE_BONUS) {
+                new_gs.blocks[pos_index].type = BONUS_SPAWN;
+                // svoje telo premeni na uzemie
+                own_body(new_gs, i);
+            }
+        }
+        */
+        gs = new_gs;
+    }
+    
+    // turbo hracom znizime turbo
     for (unsigned i = 0; i < gs.players.size(); i++) {
         if (!gs.players[i].alive) {
             continue;
         }
-        point new_position = new_gs.players[i].position;
-        switch (new_gs.players[i].dir) {
-        case LEFT:
-            new_position.x -= 1;
-            break;
-        case RIGHT:
-            new_position.x += 1;
-            break;
-        case UP:
-            new_position.y -= 1;
-            break;
-        case DOWN:
-            new_position.y += 1;
-            break;
-        }
-        new_gs.players[i].position = new_position;
-    }
-
-    // zistime, ci nenarazili do steny
-    for (unsigned i = 0; i < new_gs.players.size(); i++) {
-        if (!gs.players[i].alive) {
-            continue;
-        }
-        if (new_gs.get_block(new_gs.players[i].position).type == WALL) {
-            new_gs = kill_player(new_gs, i);
-        }
-    }
-
-    // zistime, ci sa nezrazili
-    for (unsigned i = 0; i < new_gs.players.size(); i++) {
-        if (!gs.players[i].alive) {
-            continue;
-        }
-        // nezabil sa o stenu / okraj mapy?
-        if (new_gs.players[i].position.x < 0 || new_gs.players[i].position.x >= new_gs.width) {
-            new_gs = kill_player(new_gs, i);
-        }
-        else
-        if (new_gs.players[i].position.y < 0 || new_gs.players[i].position.y >= new_gs.height) {
-            new_gs = kill_player(new_gs, i);
-        }
-        else {
-            // nezabili sme prave niekoho?
-            block curr = gs.blocks[gs.block_index(new_gs.players[i].position)];
-            if (curr.crossed_by != -1) {
-                if (curr.owned_by != curr.crossed_by) {
-                    new_gs = kill_player(new_gs, curr.crossed_by);
-                }
-            }
+        if (gs.players[i].turbo > 0) {
+            gs.players[i].turbo--;
         }
     }
     
-    // zistime celne zrazky
-    for (unsigned i = 0; i < new_gs.players.size(); i++) {
-        if (!gs.players[i].alive) {
+    // vytvori na mape bonusy
+    // na spawne sa moze objavit bonus len vtedy, ked nie je pokryty telom hadika
+    for (unsigned i = 0; i < gs.blocks.size(); i++) {
+        if (gs.blocks[i].type != BONUS_SPAWN) {
             continue;
         }
-        for (unsigned j = 0; j < new_gs.players.size(); j++) {
-            if (i == j) {
-                continue;
+        if (gs.blocks[i].crossed_by != -1) {
+            continue;
+        }
+        if (rand() % BONUS_PROB == 0) {
+            // ktory bonus sa objavil?
+            if (rand() % 2) {
+                gs.blocks[i].type = FAST_BONUS;
             }
-            if (!gs.players[j].alive) {
-                continue;
-            }
-            if (new_gs.players[i].position == new_gs.players[j].position) {
-                new_gs = kill_player(new_gs, i);
-                new_gs = kill_player(new_gs, j);
+            else {
+                gs.blocks[i].type = STONE_BONUS;
             }
         }
     }
-    
-    // kazdy hrac obsadi svoje policko
-    for (unsigned i = 0; i < new_gs.players.size(); i++) {
-        if (!new_gs.players[i].alive) continue;
-	int pos_index = new_gs.block_index(new_gs.players[i].position);
-        new_gs.blocks[pos_index].crossed_by = i;
-    }
 
-    // zistime, ci hrac neobsadil uzemie
-    for (unsigned i = 0; i < new_gs.players.size(); i++) {
-	if (!new_gs.players[i].alive) continue;
-	int pos_index = new_gs.block_index(new_gs.players[i].position);
-	if (new_gs.blocks[pos_index].owned_by == (int)i) {
-	    new_gs = own_territory(new_gs, (int)i);
-	}
-    }
-
-    return new_gs;
+    return gs;
 }

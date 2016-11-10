@@ -25,7 +25,7 @@ game_state::game_state(int num_players, game_map gm) {
     random_shuffle(spawns.begin(), spawns.end());
     for (int i = 0; i < num_players; i++) {
 	point pos = {spawns[i].first, spawns[i].second};
-	this->players.push_back(player{pos, UP, true, 0});
+	this->players.push_back(player{pos, UP, true, 0, 0});
 	this->blocks[this->block_index(pos)].crossed_by = i;
 
 	for (int x = -1; x <= 1; x++) {
