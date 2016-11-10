@@ -110,6 +110,7 @@ reflection(player)
 end()
 
 reflection(game_state)
+    member(round)
     member(width)
     member(height)
     member(players)
