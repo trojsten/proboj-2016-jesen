@@ -154,8 +154,8 @@ int main(int argc, char *argv[]) {
 
     long long lasttime = gettime();
 
-    bool koncim = false;
-    while (!koncim && gs.round < MAX_ROUNDS) {
+    int last_rounds = -1;
+    while (last_rounds != 0 && gs.round < MAX_ROUNDS) {
 	cerr << "tah " << gs.round << "\n";
 	vector<vector<player_command> > commands(klienti.size());
 
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
 		klienti[k].zabi();
 	    }
 	}
-    
+
 	stringstream state_str;
 	uloz(state_str, gs);
 	state_str << endl;
@@ -230,18 +230,27 @@ int main(int argc, char *argv[]) {
 	}
 
 	observationstream << state_str.str();
+
+	if (last_rounds < 0) {
+	    int remain_alive = 0;
+	    for (unsigned i = 0; i < gs.players.size(); i++) {
+		if (gs.players[i].alive) remain_alive++;
+	    }
+
+	    if (remain_alive == 1) last_rounds = 8;
+	} else {
+	    last_rounds -= 1;
+	    if (last_rounds <= 0) break;
+	}
     }
 	
     // cleanup
     observationstream.close();
     zabiKlientov();
 
-    // ABSENT: (nizsie uvedene)
-    // vypis casy umrtia jednotlivych hracov
-    // alebo nieco ine, podla coho hodnotit
     ofstream rankstream((zaznAdr+"/rank").c_str());
     checkOstream(rankstream, zaznAdr+"/rank");
-    // tu by nieco malo byt
+    //
     rankstream.close();
 
     // +- info o dlzke hry

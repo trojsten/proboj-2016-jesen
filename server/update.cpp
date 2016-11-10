@@ -3,9 +3,6 @@
 
 using namespace std;
 
-#define BONUS_PROB 30
-#define TURBO_DURATION 20
-
 void kill_player(game_state& gs, int dier) {
     // delete all crossed blocks
     gs.players[dier].alive = false;
@@ -203,7 +200,7 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             if (new_gs.blocks[pos_index].type == FAST_BONUS) {
                 new_gs.blocks[pos_index].type = BONUS_SPAWN;
                 // ziska dvojnasobnu rychlost
-                gs.players[i].turbo += TURBO_DURATION;
+                new_gs.players[i].turbo += TURBO_DURATION;
             }
             else
             if (new_gs.blocks[pos_index].type == STONE_BONUS) {
@@ -235,7 +232,7 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
         if (gs.blocks[i].crossed_by != -1) {
             continue;
         }
-        if (rand() % BONUS_PROB == 0) {
+        if (rand() % BONUS_PROBABILITY == 0) {
             // ktory bonus sa objavil?
             if (rand() % 2) {
                 gs.blocks[i].type = FAST_BONUS;
