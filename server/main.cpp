@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 	}
 	uzMena.insert(meno);
 	// posleme klientovi, kolkaty v poradi je
-	string uvodneData = "hrac " + to_string(i - 4) + "\n";
+	string uvodneData = "hrac " + to_string(i - 3) + "\n";
 
 	klienti.push_back(Klient(meno, uvodneData, klientAdr, zaznAdr));
 
@@ -134,13 +134,6 @@ int main(int argc, char *argv[]) {
     if (!gm.load(argv[2])) {
         exit(1);
     }
-    /*
-      game_map gm(10, 10);
-      gm.squares[2][2] = SPAWN;
-      gm.squares[2][8] = SPAWN;
-      gm.squares[8][8] = SPAWN;
-      gm.squares[8][2] = SPAWN;
-    */
     observationstream << gm.width << " " << gm.height << endl;
 
     game_state gs(pocet_hracov, gm);
@@ -157,8 +150,6 @@ int main(int argc, char *argv[]) {
 	klienti[k].posli(state_str.str());
     }
 
-    // ABSENT: zakoduje pociatocny stav a posle ho
-    // potom pocka chvilu --- cas na predpocitanie
     usleep(1000 * 1000ll);
 
     long long lasttime = gettime();
@@ -198,6 +189,7 @@ int main(int argc, char *argv[]) {
 			    continue;
 			}
 
+			cout << "hrac " << k << "'" << dir << "'" << endl;
 			if (dir == "LEFT") {
 			    commands[k].push_back(player_command{LEFT});
 			} else if (dir == "RIGHT") {

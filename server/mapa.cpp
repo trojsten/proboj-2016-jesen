@@ -53,6 +53,7 @@ bool game_map::load(string filename) {
       
       if (r == 255 && g == 255 && b == 255) squares[x][y] = EMPTY;
       else if (r == 0 && g == 255 && b == 0) squares[x][y] = SPAWN;
+      else if (r == 0 && g == 0 & b == 0) squares[x][y] = WALL;
       else return chyba("zla farba %d,%d,%d na pozicii %d,%d v '%s'\n", r, g, b, x, y, filename.c_str());
     }
   }

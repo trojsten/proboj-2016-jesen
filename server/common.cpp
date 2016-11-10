@@ -5,8 +5,12 @@ game_state::game_state(int num_players, game_map gm) {
     this->width = gm.width;
     this->height = gm.height;
     this->blocks.resize(this->width * this->height);
-    for (unsigned i = 0; i < this->blocks.size(); i++) {
-	this->blocks[i] = {-1, -1};
+
+    for (int x = 0; x < this->width; x++) {
+	for (int y = 0; y < this->height; y++) {
+	    int i = this->block_index({x, y});
+	    this->blocks[i] = {gm.squares[x][y], -1, -1};
+	}
     }
 
     vector<pair<int, int>> spawns;

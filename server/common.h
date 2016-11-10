@@ -22,6 +22,7 @@ struct point {
 };
 
 struct block {
+    square_type type;
     int owned_by;
     int crossed_by;
 };
@@ -48,6 +49,14 @@ struct game_state {
     int block_index(point pos) {
 	return pos.x * height + pos.y;
     }
+
+    block get_block(point pos) {
+	return blocks[block_index(pos)];
+    }
+
+    block get_block(int x, int y) {
+	return get_block({x, y});
+    }
 };
 
 #endif
@@ -62,6 +71,7 @@ reflection(point)
 end()
 
 reflection(block)
+    member(type)
     member(owned_by)
     member(crossed_by)
 end()
@@ -74,6 +84,8 @@ reflection(player)
 end()
 
 reflection(game_state)
+    member(width)
+    member(height)
     member(players)
     member(blocks)
 end()
