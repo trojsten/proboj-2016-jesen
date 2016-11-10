@@ -10,6 +10,8 @@
 using namespace std;
 
 const int MAX_ROUNDS = 1000;
+const int TURBO_DURATION = 8;
+const int BONUS_PROBABILITY = 50;
 
 enum direction {
     LEFT, RIGHT, UP, DOWN
