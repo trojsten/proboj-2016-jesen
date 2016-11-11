@@ -5,6 +5,7 @@
  */
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -14,7 +15,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -33,6 +33,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import proboj.BotLogReader;
 
 /**
  *
@@ -43,12 +44,11 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     /**
      * Creates new form Frame
      */
-    private int SLEEP_TIME = 500;
-    private int MIN_SLEEP_TIME = 20;
-    private int MAX_SLEEP_TIME = 3000;
-    private int SLEEP_UNIT = 20;
+    private double SLEEP_TIME = 200;
+    private double MIN_SLEEP_TIME = 20;
+    private double MAX_SLEEP_TIME = 3000;
+    private double SLEEP_UNIT = 1.2;
     public static final Font RESULTS_FONT = new Font("Noto Sans", Font.PLAIN, 20);
-    private String NEXT_TURN_LOG = "TAH ";
 
     public Frame() {
         initAll();
@@ -68,24 +68,13 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        observerPanel = new gui.Observer();
         tabbedPane = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         resultsTable = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Observer");
-
-        javax.swing.GroupLayout observerPanelLayout = new javax.swing.GroupLayout(observerPanel);
-        observerPanel.setLayout(observerPanelLayout);
-        observerPanelLayout.setHorizontalGroup(
-            observerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        observerPanelLayout.setVerticalGroup(
-            observerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 272, Short.MAX_VALUE)
-        );
 
         tabbedPane.setFont(RESULTS_FONT);
 
@@ -100,25 +89,36 @@ public class Frame extends javax.swing.JFrame implements Runnable {
         resultsTable.setEnabled(false);
         jScrollPane3.setViewportView(resultsTable);
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 272, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(observerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)))
+                        .addComponent(tabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(observerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -135,15 +135,16 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     ArrayList<String> botNames;
     ArrayList<Color> botColors;
     ArrayList<JTextArea> botLogs;
-    ArrayList<ArrayList<Integer>> playerPoints;
     ArrayList<BufferedReader> botLogReaders;
     String filename = null;
+    Observer observerPanel;
+    BotLogReader botLogLoader;
     int roundNumber=0;
     Scanner in;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
-    private gui.Observer observerPanel;
     private javax.swing.JTable resultsTable;
     private javax.swing.JTabbedPane tabbedPane;
     // End of variables declaration//GEN-END:variables
@@ -181,7 +182,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
         Action a = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SLEEP_TIME = Math.max(SLEEP_TIME - SLEEP_UNIT, MIN_SLEEP_TIME);
+                SLEEP_TIME = Math.max(SLEEP_TIME / SLEEP_UNIT, MIN_SLEEP_TIME);
                 System.out.println("FAST: " + SLEEP_TIME);
             }
         };
@@ -192,7 +193,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
         Action a = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SLEEP_TIME = Math.min(SLEEP_TIME + SLEEP_UNIT, MAX_SLEEP_TIME);
+                SLEEP_TIME = Math.min(SLEEP_TIME * SLEEP_UNIT, MAX_SLEEP_TIME);
                 System.out.println(SLEEP_TIME);
             }
         };
@@ -201,7 +202,6 @@ public class Frame extends javax.swing.JFrame implements Runnable {
 
     private void createBotLogs() {
         botLogs = new ArrayList<>();
-        playerPoints = new ArrayList<>();
 
         for (int i = 0; i < numBots; i++) {
             JTextArea a = new JTextArea();
@@ -224,25 +224,15 @@ public class Frame extends javax.swing.JFrame implements Runnable {
                 try {
                     BufferedReader read = new BufferedReader(new FileReader(Paths.get(filename, botNames.get(i) + ".log").toFile()));
                     botLogReaders.add(read);
-                    //read the frist line
-                    if(read.readLine() == null){throw new IOException();}
-                    while (true) {
-                        String line = read.readLine();
-                        if(line == null){throw new IOException();}  
-                        if (line.startsWith(NEXT_TURN_LOG)) {
-                            roundNumber = parseRound(line);
-                            break;
-                        }
-                        botLogs.get(i).setText(botLogs.get(i).getText() + String.format("[Tah %d] %s\n", roundNumber, line));
-                    }
                 } catch (FileNotFoundException ex) {
                     botLogs.get(i).setText("--NEEXISTUJE LOG!--\n");
-                } catch (IOException ex) {
-                    botLogs.get(i).setText(botLogs.get(i).getText() + String.format("--KONIEC BOT LOGU!--\n"));
-                    botLogReaders.set(i, null);
                 }
             }
         }
+        
+        //start loading bot logs
+        botLogLoader = new BotLogReader(botLogReaders, botLogs);
+        new Thread(botLogLoader).start();
     }
 
     private void createTable() {
@@ -261,6 +251,9 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     }
 
     private void initObserver() {
+        jPanel1.setLayout(new BorderLayout());
+        observerPanel = new Observer();
+        jPanel1.add(observerPanel);
         if (filename != null) {
             try {
                 in = new Scanner(Paths.get(filename, "observation").toFile());
@@ -278,7 +271,7 @@ public class Frame extends javax.swing.JFrame implements Runnable {
 
         for (int i = 0; i < numBots; i++) {
             botNames.add(in.next());
-            float r = in.nextFloat(), g = in.nextFloat(), b = in.nextFloat();in.nextFloat();
+            float r = in.nextFloat(), g = in.nextFloat(), b = in.nextFloat(), alfa = in.nextFloat();
             botColors.add(new Color(r, g, b));
         }
         N = in.nextInt();
@@ -289,67 +282,59 @@ public class Frame extends javax.swing.JFrame implements Runnable {
 
     @Override
     public void run() {
-        int whoseArea[][] = new int[N][M];
-        int whoseSnake[][] = new int[N][M];
-
+        int data[][][] = new int [N][M][3];
+        int heads[][] = new int [numBots][2];
+        int live[] = new int [numBots];
+        
         while (true) {
             long time = System.currentTimeMillis();
             //read general
-            playerPoints = new ArrayList<>();
+            if(in.hasNextInt() == false){
+                setTitle("Observer - Koniec hry");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                dispose();
+                return;
+            }
             
-            in.nextInt();
+            int roundNum = in.nextInt();
+            setTitle(String.format("Observer [%d]", roundNum));
+            int mapN = in.nextInt();
+            int mapM = in.nextInt();
+            int numB = in.nextInt();
+            
             for (int i = 0; i < numBots; i++) {
-                ArrayList<Integer> tmpList = new ArrayList<>();
-                
-                int xpos = in.nextInt();
-                int ypos = in.nextInt();
+                heads[i][0] =in.nextInt();
+                heads[i][1] = in.nextInt();
                 int direciton = in.nextInt();
-                int alive = in.nextInt();
+                live[i] = in.nextInt();
                 int score = in.nextInt();
-
-                tmpList.add(xpos);
-                tmpList.add(ypos);
-                if(xpos >= N || ypos >= M)System.err.println("ERROR");
-                playerPoints.add(tmpList);
 
                 resultsTable.getModel().setValueAt(score, i, 1);
             }
 
             //read map
-            in.nextInt(); //miso prints num of elements in 
+            int numElem = in.nextInt(); //miso prints num of elements in 
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < M; j++) {
-                    whoseArea[i][j] = in.nextInt();
-                    whoseSnake[i][j] = in.nextInt();
-                }
-            }
-
-            //read logs
-            for (int i = 0; i < numBots; i++) {
-                if(botLogReaders.get(i) == null)continue;
-                try {
-                    String s = botLogReaders.get(i).readLine();
-                    if(s == null){throw new IOException();}
-                    while (s.startsWith(NEXT_TURN_LOG) == false) {
-                        botLogs.get(i).setText(botLogs.get(i).getText() + String.format("[Tah %d] %s\n", roundNumber, s));
-                    }
-                    roundNumber = parseRound(s);
-                } catch (IOException ex) {
-                    botLogReaders.set(i, null);
-                    botLogs.get(i).setText(botLogs.get(i).getText() + String.format("--KONIEC BOT LOGU!--\n"));
-                    //Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    data[i][j][Observer.TYPE_INDEX] = in.nextInt();
+                    data[i][j][Observer.AREA_INDEX] = in.nextInt();
+                    data[i][j][Observer.SNAKE_INDEX] = in.nextInt();
                 }
             }
 
             SwingUtilities.invokeLater(() -> {
-                observerPanel.setData(whoseArea, whoseSnake, playerPoints);
+                observerPanel.setData(data, heads, live);
                 observerPanel.repaint();
             });
 
             long totTime = (System.currentTimeMillis() - time);
             //System.out.println("TOT time: " + totTime);
             try {
-                Thread.sleep(Math.max(SLEEP_TIME - totTime, (long) MIN_SLEEP_TIME));
+                Thread.sleep((long) Math.max(SLEEP_TIME - totTime, (long) MIN_SLEEP_TIME));
                 synchronized (this) {
                     while (paused) {
                         this.wait();
@@ -377,17 +362,18 @@ public class Frame extends javax.swing.JFrame implements Runnable {
     }
 
     private void initAll() {
+        System.out.println("COMP");
         initComponents();
+        System.out.println("OBS");
         initObserver();
+        System.out.println("BOT LOGS");
         createBotLogs();
+        System.out.println("TABLE");
         createTable();
+        System.out.println("BIND KEYS");
         bindKeys();
 
         startThread();
-    }
-
-    private int parseRound(String s) {
-        return Integer.parseInt(s.split(" ")[1]);
     }
 
     private static class MyTableCellRenderer extends DefaultTableCellRenderer {

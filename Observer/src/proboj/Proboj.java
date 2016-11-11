@@ -6,6 +6,7 @@
 package proboj;
 
 import gui.Frame;
+import javax.swing.JFrame;
 
 /**
  *
@@ -18,10 +19,6 @@ public class Proboj {
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -38,7 +35,6 @@ public class Proboj {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
         /* Create and display the form */
         Frame frame;
@@ -47,9 +43,13 @@ public class Proboj {
         } else {
             frame = new Frame(args[0]);
         }
+        
+        System.out.println("IDEM");
         java.awt.EventQueue.invokeLater(() -> {
+            System.out.println("Starting");
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
             frame.setFocus();
         });
     }

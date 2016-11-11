@@ -18,7 +18,7 @@ using namespace std;
 #include "marshal.h"
 
 const auto MAX_CITAJ = 1024;
-const auto ROUND_TIME = 10;
+const auto ROUND_TIME = 40;
 
 vector<Klient> klienti;
 
@@ -66,7 +66,7 @@ string last_valid_substr(string s) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 5) {
+    if (argc < 4) {
 	fprintf(stderr, "usage: %s <zaznamovy-adresar> <mapa> <adresare-klienta-1> <adresar-klienta-2> ...\n", argv[0]);
 	return 0;
     }
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     fstream observationstream(obsubor.c_str(), fstream::out | fstream::trunc);
     checkOstream(observationstream, "observation");
 	
-    random_shuffle(argv + 3, argv + argc);
+    // random_shuffle(argv + 3, argv + argc);
     set<string> uzMena;
 
     int pocet_hracov = argc - 3;
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     while (last_rounds != 0 && gs.round < MAX_ROUNDS) {
 	cerr << "tah " << gs.round << "\n";
 	vector<vector<player_command> > commands(klienti.size());
-
+    
 	while (gettime() - lasttime < ROUND_TIME) {
 	    // fetchujeme spravy klientov, ale este nesimulujeme kolo
 	    for (unsigned k = 0; k < klienti.size(); k++) {
@@ -168,7 +168,11 @@ int main(int argc, char *argv[]) {
 		if (!klienti[k].zije()) {
 		    klienti[k].restartuj();
 		    // klientovi posleme relevantne data
-		    // klienti[k].posli("blablabla");
+            if (klienti[k].zije()) {
+                stringstream old_state_str;
+                uloz(old_state_str, gs);
+                klienti[k].posli(old_state_str.str());
+            }
 		    continue;
 		}
 
@@ -237,7 +241,7 @@ int main(int argc, char *argv[]) {
 		if (gs.players[i].alive) remain_alive++;
 	    }
 
-	    if (remain_alive == 1) last_rounds = 8;
+	    if (remain_alive <= 1) last_rounds = 8;
 	} else {
 	    last_rounds -= 1;
 	    if (last_rounds <= 0) break;
@@ -250,7 +254,9 @@ int main(int argc, char *argv[]) {
 
     ofstream rankstream((zaznAdr+"/rank").c_str());
     checkOstream(rankstream, zaznAdr+"/rank");
-    //
+    for (unsigned i = 0; i < gs.players.size(); i++) {
+        rankstream << /*klienti[i].meno <<*/ gs.players[i].score << "\n";
+    }
     rankstream.close();
 
     // +- info o dlzke hry
