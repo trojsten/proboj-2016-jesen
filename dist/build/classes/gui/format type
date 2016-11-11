@@ -1,0 +1,11 @@
+//read the frist line
+                    if(read.readLine() == null){throw new IOException("Koniec bot logu!");}
+                    while (true) {
+                        String line = read.readLine();
+                        if(line == null){throw new IOException("Koniec bot logu!");}  
+                        if (line.startsWith(NEXT_TURN_LOG)) {
+                            roundNumber = parseRound(line);
+                            break;
+                        }
+                        botLogs.get(i).setText(botLogs.get(i).getText() + String.format("[ INIT ] %s\n", line));
+                    }
