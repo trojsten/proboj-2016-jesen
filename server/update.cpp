@@ -136,14 +136,17 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             // nezabil sa o stenu / okraj mapy?
             if (new_gs.players[i].position.x < 0 || new_gs.players[i].position.x >= new_gs.width) {
                 kill_player(new_gs, i);
+		cerr << "hrac " << i << " narazil do okraja mapy" << endl;
             } else if (new_gs.players[i].position.y < 0 || new_gs.players[i].position.y >= new_gs.height) {
                 kill_player(new_gs, i);
+		cerr << "hrac " << i << " narazil do okraja mapy" << endl;
             } else {
                 // nezabili sme prave niekoho?
                 block curr = gs.blocks[gs.block_index(new_gs.players[i].position)];
                 if (curr.crossed_by != -1) {
                     if (curr.owned_by != curr.crossed_by) {
                         int blocks_killed = kill_player(new_gs, curr.crossed_by);
+			cerr << "hrac " << curr.crossed_by << " bol zabity hracom " << i << endl;
 
 			if (curr.crossed_by != i) {
 			    new_gs.players[i].score += 32 + blocks_killed / 4;
@@ -160,6 +163,7 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
             }
             if (new_gs.get_block(new_gs.players[i].position).type == WALL) {
                 kill_player(new_gs, i);
+		cerr << "hrac " << i << " narazil do steny" << endl;
             }
         }
         
@@ -178,6 +182,7 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
                 if (new_gs.players[i].position == new_gs.players[j].position) {
                     new_gs.players[j].score += 32 + kill_player(new_gs, i) / 4;
                     new_gs.players[i].score += 32 + kill_player(new_gs, j) / 4;
+		    cerr << "hraci " << i << " a " << j << " sa celne zrazili" << endl;
                 }
             }
         }
