@@ -66,7 +66,7 @@ string last_valid_substr(string s) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 5) {
+    if (argc < 4) {
 	fprintf(stderr, "usage: %s <zaznamovy-adresar> <mapa> <adresare-klienta-1> <adresar-klienta-2> ...\n", argv[0]);
 	return 0;
     }
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     fstream observationstream(obsubor.c_str(), fstream::out | fstream::trunc);
     checkOstream(observationstream, "observation");
 	
-    random_shuffle(argv + 3, argv + argc);
+    // random_shuffle(argv + 3, argv + argc);
     set<string> uzMena;
 
     int pocet_hracov = argc - 3;
@@ -250,7 +250,9 @@ int main(int argc, char *argv[]) {
 
     ofstream rankstream((zaznAdr+"/rank").c_str());
     checkOstream(rankstream, zaznAdr+"/rank");
-    //
+    for (unsigned i = 0; i < gs.players.size(); i++) {
+        rankstream << /*klienti[i].meno <<*/ gs.players[i].score << "\n";
+    }
     rankstream.close();
 
     // +- info o dlzke hry

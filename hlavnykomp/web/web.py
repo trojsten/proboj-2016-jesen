@@ -53,78 +53,20 @@ def get_records():
         id = basename[:-len('.manifest')]
         lines = open(path).readlines()
         manifest = dict(line.rstrip('\n').split('=', 1) for line in lines)
-        manifest['clients'] = manifest['clients'].strip(',')
-        #print id,
-        #print manifest['clients']
-        maperd = [(x.split('/')[-1], i) for i,x in enumerate(manifest['clients'].strip(' ,').split(','))]
-        maperd += [(x.split('/')[-2]+'/', i) for i,x in enumerate(manifest['clients'].strip(' ,').split(','))]
-        maperd += [(x.split('/')[-2]+'', i) for i,x in enumerate(manifest['clients'].strip(' ,').split(','))]
-        maper = dict(maperd)
-        
-        #print maper
-        times = []
-        pom = 0
-        if 'rank' not in manifest:
-            continue
-        print "#### maper"
-        #print maper
-        #print id
-        for x in manifest['rank'].split(','):
-            #print x
-            pom+=1
-            #print x
-            meno = x.split()[0]
-            cas =  int(x.split()[1])
-            print meno
-            if meno in maper:
-                times.append([cas, maper[meno]])
-        random.shuffle(times)
-        #print times
-        times = sorted(times, key = lambda x: [-x[0],x[1]])
-        realrank = [0]*len(times)
-        consts = [10, 5, 1, 0] + [0]*pom
-        for i, x in enumerate(times):
-            #print i,x
-            #print 
-            realrank[x[1]] = consts[i]
-        
-        manifest['rank'] = ','.join(map(str,realrank))
         records[id] = manifest
     return records
 
 
 def get_ranklist():
     ranks = dict((id, 0) for id, title, hash in druzinky)
-    played = dict((id, 0) for id, title, hash in druzinky)
-    all_records = sorted(get_records().items())
-    print all_records[:2]
-    print all_records[-2:]
-    #print map(lambda x: x[0], all_records)
-    const = 10
-    for i in xrange((len(all_records)-const)):
-        usek = all_records[i*const:(i+1)*const]
-        usek_rank = dict((id, []) for id, title, hash in druzinky)
-        for id, manifest in usek:
-            if manifest['state'] != 'displayed': continue
-            builds = manifest['clients'].strip(',').split(',')
-            myranks = manifest['rank'].strip(',').split(',')
-            #print id
-            #print manifest['rank']
-            #print builds
-            #print myranks
-            for j, build in enumerate(builds):
-                #print i, build
-                client = build.partition('/')[0]
-                usek_rank[client].append(int(myranks[j]))
-        
-        for  hrac,ratingy in usek_rank.items():
-            if len(ratingy)==0:
-                continue
-            usek_mean = ((sum(ratingy)+0.0)/len(ratingy))
-            ranks[hrac]+= usek_mean/ (0.999**i)
-  
-    #print played
-    return sorted(((round(rank,2), id) for id, rank in ranks.items()), reverse=True)
+    for id, manifest in get_records().items():
+        if manifest['state'] != 'displayed': continue
+        builds = manifest['clients'].strip(',').split(',')
+        myranks = manifest['rank'].strip(',').split(',')
+        for i, build in enumerate(builds):
+            client = build.partition('/')[0]
+            ranks[client] = (ranks[client] + int(myranks[i])) * 0.9
+    return reversed(sorted(((round(rank, 2), id) for id, rank in ranks.items())))
 
 
 def get_uploads(username):
@@ -268,6 +210,7 @@ def records():
         clients = map(lambda qq: qq.split('/')[0], manifest['clients'].strip(',').split(','))
         if rank:
             rank = zip(clients,rank)
+        rank = sorted(rank)
         data.append(dict(id=id, begin=begin, link=link, map=mapa, state=state,
             rank=rank))
     return render_template('records.html', records=data)

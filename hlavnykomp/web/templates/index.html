@@ -55,8 +55,12 @@
   <p><a href="{{ url_for('records') }}">Archív odohratých hier</a></p>
   {% if config['GIT'] %}
     <p><code>git clone {{ config['GIT'] }}</code> &larr; stiahne proboj</p>
-    <p><code>git pull</code> &larr; aktualizuje na najnovšiu verziu (spúšťať v adresári "proboj")</p>
+    <p><code>git pull</code> &larr; aktualizuje na najnovšiu verziu (spúšťať v adresári "proboj-2016-jesen")</p>
   {% endif %}
+  
+  <p><b>Vedeli ste, ze:</b> ak v debugovacom vypise napisete "TAH 7" a na dalsom riadku "text",
+  tak vam observer zobrazi tento debugovaci vypis v tahu 7? Pre podrobnostichtivych vtedy, ked si
+  vas klient mysli, ze je tah 7. Toto sa vam urcite zide pri debugovani.</p>
 
   {% if username %}
     <h2>Prihlásená družinka: {{ usertitles[username] }}</h2>
