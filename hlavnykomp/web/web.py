@@ -58,8 +58,9 @@ def get_records():
 
 
 def get_ranklist():
-    ranks = dict((id, 0) for id, title, hash in druzinky)
-    for id, manifest in get_records().items():
+    ranks = dict((id, 0.0) for id, title, hash in druzinky)
+    all_records = sorted(get_records().items())
+    for id, manifest in all_records:
         if manifest['state'] != 'displayed': continue
         builds = manifest['clients'].strip(',').split(',')
         myranks = manifest['rank'].strip(',').split(',')
@@ -210,7 +211,7 @@ def records():
         clients = map(lambda qq: qq.split('/')[0], manifest['clients'].strip(',').split(','))
         if rank:
             rank = zip(clients,rank)
-        rank = sorted(rank)
+            rank = sorted(rank)
         data.append(dict(id=id, begin=begin, link=link, map=mapa, state=state,
             rank=rank))
     return render_template('records.html', records=data)

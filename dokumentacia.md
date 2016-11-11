@@ -77,7 +77,8 @@ Takisto nechcete, aby váš had nabúral do stien alebo do okraju mapy.
 Na mape sa taktiež nachádzajú dva rôzne bonusy. Prvým z nich je
 dvojnásobná rýchlosť na určitú dobu. Druhý spôsobí, že telo vášho
 hada sa okamžite zmení na jeho územie. V momente, keď bonus spapáte,
-ho aj hneď použijete.
+ho aj hneď použijete. Bonusy sa objavuju na specialnych polickach,
+v kazdom kole s urcitou pravdepodobnostou.
 
 Ako sa ťahá
 -----------

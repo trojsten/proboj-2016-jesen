@@ -34,7 +34,7 @@ while true; do
     buildy+=("${najnovsi%/*}")
   done
   
-  if (( $counter <= 0 ))
+  if (( $counter <= 1 ))
   then
     echo "klientov len $counter, nepustam servera"
     sleep 30.0

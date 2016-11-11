@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
     while (last_rounds != 0 && gs.round < MAX_ROUNDS) {
 	cerr << "tah " << gs.round << "\n";
 	vector<vector<player_command> > commands(klienti.size());
-
+    
 	while (gettime() - lasttime < ROUND_TIME) {
 	    // fetchujeme spravy klientov, ale este nesimulujeme kolo
 	    for (unsigned k = 0; k < klienti.size(); k++) {
@@ -168,7 +168,11 @@ int main(int argc, char *argv[]) {
 		if (!klienti[k].zije()) {
 		    klienti[k].restartuj();
 		    // klientovi posleme relevantne data
-		    // klienti[k].posli("blablabla");
+            if (klienti[k].zije()) {
+                stringstream old_state_str;
+                uloz(old_state_str, gs);
+                klienti[k].posli(old_state_str.str());
+            }
 		    continue;
 		}
 
