@@ -123,7 +123,7 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
 
         // zistime, ci sa nezrazili
         for (unsigned i = 0; i < new_gs.players.size(); i++) {
-            if (!new_gs.players[i].alive) continue;
+            if (!gs.players[i].alive) continue;
 	    if (turbo_step && new_gs.players[i].turbo <= 0) continue;
 
             // nezabil sa o stenu / okraj mapy?
