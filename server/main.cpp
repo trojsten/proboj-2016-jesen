@@ -209,8 +209,6 @@ int main(int argc, char *argv[]) {
 		}
 	    }
 	}
-	lasttime = gettime();
-
 	gs = update_game_state(gs, commands);
     
 	// zabijeme mrtvych hracov
@@ -232,6 +230,8 @@ int main(int argc, char *argv[]) {
 		klienti[k].posli(state_str.str());
 	    }
 	}
+
+	lasttime = gettime();
 
 	observationstream << state_str.str();
 
