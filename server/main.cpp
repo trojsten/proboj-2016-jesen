@@ -237,7 +237,15 @@ int main(int argc, char *argv[]) {
 		if (gs.players[i].alive) remain_alive++;
 	    }
 
-	    if (remain_alive <= 1) last_rounds = 8;
+	    if (remain_alive <= 1) {
+		last_rounds = 8;
+
+		for (unsigned i = 0; i < gs.players.size(); i++) {
+		    if (gs.players[i].alive) {
+			gs.players[i].score += 47;
+		    }
+		}
+	    }
 	} else {
 	    last_rounds -= 1;
 	    if (last_rounds <= 0) break;

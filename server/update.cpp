@@ -145,7 +145,9 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
                     if (curr.owned_by != curr.crossed_by) {
                         int blocks_killed = kill_player(new_gs, curr.crossed_by);
 
-			new_gs.players[i].score += 32 + blocks_killed / 4;
+			if (curr.crossed_by != i) {
+			    new_gs.players[i].score += 32 + blocks_killed / 4;
+			}
                     }
                 }
             }
@@ -174,8 +176,8 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
                     continue;
                 }
                 if (new_gs.players[i].position == new_gs.players[j].position) {
-                    kill_player(new_gs, i);
-                    kill_player(new_gs, j);
+                    new_gs.players[j].score += 32 + kill_player(new_gs, i) / 4;
+                    new_gs.players[i].score += 32 + kill_player(new_gs, j) / 4;
                 }
             }
         }
