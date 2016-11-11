@@ -1,7 +1,9 @@
-klienti=( bubokrki nulano paulinia m jedejedemasinka okno MAGA nahodicka buj )
+klienti=( bubokrki paulinia m jedejedemasinka okno MAGA nahodicka buj nulano )
 mapy=( mapy/*.ppm )
 nazvy=(
 
+  'BUBOKRKI'
+  'nulano'
   'buj'
   'nahodicka'
   'MAGA'
@@ -9,7 +11,5 @@ nazvy=(
   'Jedejedemasinka'
   'Makroωlnky'
   'paulinia'
-  'nulano'
-  'BUBOKRKI'
 )
 
