@@ -3,14 +3,21 @@
 
 using namespace std;
 
-void kill_player(game_state& gs, int dier) {
+int kill_player(game_state& gs, int dier) {
+    int blocks = 0;
+
     // delete all crossed blocks
     gs.players[dier].alive = false;
     for (unsigned i = 0; i < gs.blocks.size(); i++) {
 	if (gs.blocks[i].crossed_by == dier) {
 	    gs.blocks[i].crossed_by = -1;
 	}
+	if (gs.blocks[i].owned_by == dier) {
+	    blocks++;
+	}
     }
+
+    return blocks;
 }
 
 int own_body(game_state& gs, int player) {
@@ -136,7 +143,9 @@ game_state update_game_state(game_state gs, vector<vector<player_command> > comm
                 block curr = gs.blocks[gs.block_index(new_gs.players[i].position)];
                 if (curr.crossed_by != -1) {
                     if (curr.owned_by != curr.crossed_by) {
-                        kill_player(new_gs, curr.crossed_by);
+                        int blocks_killed = kill_player(new_gs, curr.crossed_by);
+
+			new_gs.players[i].score += 32 + blocks_killed / 4;
                     }
                 }
             }
