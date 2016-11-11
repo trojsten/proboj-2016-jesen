@@ -40,6 +40,7 @@ klienti/vasklient klienti/hlupy` To spustí hru s troma hráčmi (vaším, druh�
 vaším a hlúpym) a uloží záznam do `zaznamy/01`. Ten si môžete pozrieť tak,
 že najprv zmeníte working directory na `Observer` (príkaz `cd Observer`)
 a potom zadáte príkaz `java -jar ./dist/Proboj.jar ../zaznamy/01`.
+Alebo zo probojoveho adresara zadate ./server
 
 Server sa vášho klienta pýta, čo chce robiť. Pritom ale nečaká na vášho
 klienta --- ak váš klient dlho premýšľa, tak keď konečne spraví ťah,
@@ -76,7 +77,8 @@ Takisto nechcete, aby váš had nabúral do stien alebo do okraju mapy.
 Na mape sa taktiež nachádzajú dva rôzne bonusy. Prvým z nich je
 dvojnásobná rýchlosť na určitú dobu. Druhý spôsobí, že telo vášho
 hada sa okamžite zmení na jeho územie. V momente, keď bonus spapáte,
-ho aj hneď použijete.
+ho aj hneď použijete. Bonusy sa objavuju na specialnych polickach,
+v kazdom kole s urcitou pravdepodobnostou.
 
 Ako sa ťahá
 -----------

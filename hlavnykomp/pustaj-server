@@ -33,6 +33,14 @@ while true; do
     [ -z "$najnovsi" ] && echo "klient $klient nema ziaden ok build!" && let counter-=1 && continue
     buildy+=("${najnovsi%/*}")
   done
+  
+  if (( $counter <= 1 ))
+  then
+    echo "klientov len $counter, nepustam servera"
+    sleep 30.0
+    continue;
+  fi
+  
   buildystr="${buildy[*]}"
   buildystr="${buildystr//"hlavnykomp/buildy/"}"
   echo "klienti: $buildystr"
@@ -56,7 +64,7 @@ state=playing" > $dir.manifest
   done > $dir/titles
 
   if ./server/server $dir $mapa ${buildy[@]} &>$dir/stderr.srv; then
-    rank=`tail -n+2 $dir/rank`
+    rank=`tail $dir/rank`
     echo "hotovo"
     echo "rank=${rank//$'\n'/,}" >> $dir.manifest
     sed -i 's/^state=.*/state=displaying/' $dir.manifest

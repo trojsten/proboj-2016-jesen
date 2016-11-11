@@ -1,17 +1,15 @@
-
-klienti=( hlupy fljun amazon paulinia perry nulano struze baklazan total jobokrki luaro)
-mapy=( mapy/*.map )
+klienti=( bubokrki nulano paulinia m jedejedemasinka okno MAGA nahodicka buj )
+mapy=( mapy/*.ppm )
 nazvy=(
-  'Hlupy'
-  'Fljun'
-  'Amazon'
-  'Paulinia'
-  'Perry'
-  'Nulano'
-  'Styri ruze'
-  'Baklazan'
-  'Total Anihilation'
-  'Jobokrki'
-  'Lukas a Roman'
+
+  'buj'
+  'nahodicka'
+  'MAGA'
+  'Windows Vista'
+  'Jedejedemasinka'
+  'Makroωlnky'
+  'paulinia'
+  'nulano'
+  'BUBOKRKI'
 )
 
