@@ -3,7 +3,6 @@
 klienti=( bubokrki paulinia m jedejedemasinka okno MAGA nahodicka buj nulano niekto )
 mapy=( mapy/*.ppm )
 nazvy=(
-
   'niekto'
   'BUBOKRKI'
   'nulano'
@@ -15,8 +14,6 @@ nazvy=(
   'Makroωlnky'
   'paulinia'
 )
-
-
 
 for mapa in ${mapy[@]}; do
   echo "spustam hru na mape $mapa"

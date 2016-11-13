@@ -9,11 +9,6 @@ server/streamtest
 observer/observer
 klient.tar.gz
 hrac
-hlavnykomp/srvconfig
-hlavnykomp/webconfig
-hlavnykomp/web/*env
-hlavnykomp/buildy
-hlavnykomp/uploady
 /veduci
 download
 zaznamy

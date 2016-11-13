@@ -1,0 +1,162 @@
+[20:54:32.728] startujem server, seed je 3064245360
+main: prepisujem zaznamovy adresar: zaznamy/000007
+[20:54:32.728] restartujem klienta okno
+[20:54:32.728] restartujem klienta nahodicka
+[20:54:32.728] restartujem klienta nulano
+[20:54:32.729] restartujem klienta veduci
+tah 0
+hrac 0'DOWN'
+hrac 1'UP'
+hrac 2'LEFT'
+hrac 3'RIGHT'
+tah 1
+hrac 2'LEFT'
+hrac 1'UP'
+hrac 0'DOWN'
+hrac 3'RIGHT'
+tah 2
+hrac 1'LEFT'
+hrac 2'RIGHT'
+hrac 3'RIGHT'
+hrac 0'RIGHT'
+tah 3
+hrac 1'LEFT'
+hrac 2'DOWN'
+hrac 3'RIGHT'
+hrac 0'UP'
+tah 4
+hrac 1'DOWN'
+hrac 2'DOWN'
+hrac 3'RIGHT'
+hrac 0'UP'
+tah 5
+hrac 1'DOWN'
+hrac 2'UP'
+hrac 3'RIGHT'
+hrac 0'RIGHT'
+tah 6
+hrac 1'RIGHT'
+hrac 2'LEFT'
+hrac 3'RIGHT'
+hrac 0'RIGHT'
+tah 7
+hrac 1'UP'
+hrac 2'RIGHT'
+hrac 3'UP'
+hrac 0'RIGHT'
+tah 8
+hrac 1'UP'
+hrac 2'DOWN'
+hrac 3'RIGHT'
+hrac 0'UP'
+tah 9
+hrac 1'UP'
+hrac 2'DOWN'
+hrac 3'RIGHT'
+hrac 0'LEFT'
+tah 10
+hrac 1'LEFT'
+hrac 2'UP'
+hrac 3'RIGHT'
+hrac 0'LEFT'
+tah 11
+hrac 1'LEFT'
+hrac 2'RIGHT'
+hrac 3'UP'
+hrac 0'UP'
+tah 12
+hrac 1'DOWN'
+hrac 2'UP'
+hrac 3'UP'
+hrac 0'UP'
+tah 13
+hrac 1'DOWN'
+hrac 2'DOWN'
+hrac 3'RIGHT'
+hrac 0'UP'
+hrac 0 bol zabity hracom 3
+proces 28403 umrel na: Terminated
+write: pid -1: Bad file descriptor
+tah 14
+hrac 1'RIGHT'
+hrac 2'DOWN'
+hrac 3'RIGHT'
+tah 15
+hrac 2'LEFT'
+hrac 1'UP'
+hrac 3'RIGHT'
+tah 16
+hrac 2'DOWN'
+hrac 1'UP'
+hrac 3'RIGHT'
+tah 17
+hrac 2'UP'
+hrac 1'UP'
+hrac 3'UP'
+tah 18
+hrac 2'RIGHT'
+hrac 1'LEFT'
+hrac 3'LEFT'
+tah 19
+hrac 2'DOWN'
+hrac 1'LEFT'
+hrac 3'LEFT'
+tah 20
+hrac 2'LEFT'
+hrac 1'DOWN'
+hrac 3'UP'
+tah 21
+hrac 2'DOWN'
+hrac 1'DOWN'
+hrac 3'LEFT'
+tah 22
+hrac 2'UP'
+hrac 1'RIGHT'
+hrac 3'UP'
+tah 23
+hrac 2'LEFT'
+hrac 1'UP'
+hrac 3'UP'
+tah 24
+hrac 2'RIGHT'
+hrac 1'UP'
+hrac 3'LEFT'
+tah 25
+hrac 2'DOWN'
+hrac 1'UP'
+hrac 3'DOWN'
+tah 26
+hrac 2'DOWN'
+hrac 1'LEFT'
+hrac 3'LEFT'
+tah 27
+hrac 2'UP'
+hrac 1'LEFT'
+hrac 3'DOWN'
+tah 28
+hrac 2'RIGHT'
+hrac 1'DOWN'
+hrac 3'DOWN'
+hraci 2 a 3 sa celne zrazili
+proces 28406 umrel na: Terminated
+proces 28405 umrel na: Terminated
+write: pid -1: Bad file descriptor
+write: pid -1: Bad file descriptor
+tah 29
+hrac 1'DOWN'
+tah 30
+hrac 1'RIGHT'
+tah 31
+hrac 1'UP'
+tah 32
+hrac 1'DOWN'
+tah 33
+hrac 1'DOWN'
+tah 34
+hrac 1'RIGHT'
+tah 35
+hrac 1'RIGHT'
+tah 36
+hrac 1'UP'
+ukoncujem klientov
+[20:54:35.341] 
