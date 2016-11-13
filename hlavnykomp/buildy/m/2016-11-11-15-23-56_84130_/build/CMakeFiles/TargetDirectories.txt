@@ -1,0 +1,3 @@
+/home/sammko/src/proboj/proboj/klienti/player/build/CMakeFiles/edit_cache.dir
+/home/sammko/src/proboj/proboj/klienti/player/build/CMakeFiles/rebuild_cache.dir
+/home/sammko/src/proboj/proboj/klienti/player/build/CMakeFiles/player.dir
