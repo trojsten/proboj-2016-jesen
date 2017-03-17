@@ -65,3 +65,11 @@ je finale)
 Ak si chcete spravit vlastne vyhodnotenie, tak sa vam zidu skripty
 `testall`, `testall1`, ... nachadzajuce sa v koreni proboja.
 Konkretnejsie pokyny zatial neexistuju.
+
+## Nejake obrazky na zaver
+
+![](proboj3a.png)
+
+![](proboj3b.png)
+
+![](proboj3c.png)
